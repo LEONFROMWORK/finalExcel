@@ -122,7 +122,7 @@ gem "sidekiq-cron", "~> 1.12"
 # Image Processing - 3-tier system
 # gem "ruby-opencv", "~> 0.0.18" # Image processing for table detection - Skip due to build issues
 gem "rtesseract", "~> 3.1"     # Ruby wrapper for Tesseract OCR
-gem "ruby-openai", "~> 7.3"    # OpenAI/OpenRouter integration
+gem "ruby-openai", "~> 8.1"    # OpenAI/OpenRouter integration
 gem "httpclient", "~> 2.8"     # For image downloading
 gem "chunky_png", "~> 1.4"     # Pure Ruby image analysis
 
