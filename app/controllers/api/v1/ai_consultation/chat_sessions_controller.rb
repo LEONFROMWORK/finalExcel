@@ -3,8 +3,9 @@
 module Api
   module V1
     module AiConsultation
-      class ChatSessionsController < Api::V1::BaseController
-        before_action :authenticate_user!
+      class ChatSessionsController < Api::V1::ApiController
+        # FREE TEST PERIOD - Authentication disabled
+        # before_action :authenticate_user!
         before_action :set_chat_session, only: [ :show, :update, :destroy, :messages, :export ]
 
         def index

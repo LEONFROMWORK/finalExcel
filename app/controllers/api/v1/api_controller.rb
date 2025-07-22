@@ -74,6 +74,13 @@ module Api
         return true if Rails.application.config.free_test_period[:enabled]
         require_admin!
       end
+
+      def render_error(messages, status = :bad_request)
+        render json: {
+          error: messages.is_a?(Array) ? messages.join(", ") : messages,
+          errors: messages.is_a?(Array) ? messages : [messages]
+        }, status: status
+      end
     end
   end
 end
