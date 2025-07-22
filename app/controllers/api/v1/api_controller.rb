@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'ostruct'
+require_relative '../../../shared/errors/domain_error'
 
 module Api
   module V1
