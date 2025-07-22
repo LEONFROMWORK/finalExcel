@@ -11,19 +11,8 @@ npm install
 echo "🏗️ Building Vite assets..."
 npm run build
 
-# Set SECRET_KEY_BASE for asset compilation if not set
-if [ -z "$SECRET_KEY_BASE" ]; then
-  export SECRET_KEY_BASE=$(ruby -rsecurerandom -e 'puts SecureRandom.hex(64)')
-  echo "🔑 Generated temporary SECRET_KEY_BASE for build"
-fi
-
-# Precompile assets
-echo "🎨 Precompiling assets..."
-RAILS_ENV=production bundle exec rails assets:precompile
-
-# Clean old assets
-echo "🧹 Cleaning old assets..."
-RAILS_ENV=production bundle exec rails assets:clean
+# Skip Rails asset precompilation - we're using Vite
+echo "⏭️ Skipping Rails asset precompilation (using Vite)"
 
 # Run database migrations
 if [ -n "$DATABASE_URL" ]; then
