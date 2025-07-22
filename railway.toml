@@ -1,41 +1,13 @@
-# Railway deployment configuration
-# This configures the main app and Selenium service for web scraping
-
 [build]
-  builder = "nixpacks"
-  buildCommand = "bundle install && bundle exec rake assets:precompile"
+builder = "NIXPACKS"
+buildCommand = "./bin/railway-build.sh"
 
 [deploy]
-  startCommand = "bundle exec rails server -b 0.0.0.0 -p ${PORT:-3000}"
-  healthcheckPath = "/health"
-  healthcheckTimeout = 300
-  restartPolicyType = "ON_FAILURE"
-  restartPolicyMaxRetries = 10
-  memoryReservationMB = 512
+startCommand = "bundle exec rails server -b 0.0.0.0 -p ${PORT:-3000}"
+healthcheckPath = "/up"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
 
-[services]
-  # Main Rails application
-  [services.app]
-    source = "."
-    
-  # Selenium standalone Chrome service
-  # Deploy using: railway add selenium/standalone-chrome:latest
-  [services.selenium]
-    source = "selenium/standalone-chrome:latest"
-    
-    [[services.selenium.ports]]
-      port = 4444
-      
-    [services.selenium.env]
-      SE_NODE_MAX_SESSIONS = "5"
-      SE_NODE_SESSION_TIMEOUT = "300"
-      SE_VNC_NO_PASSWORD = "1"
-      SE_SCREEN_WIDTH = "1366"
-      SE_SCREEN_HEIGHT = "768"
-
-# Environment variable mappings
-[environments]
-  [environments.production]
-    # Map Selenium service URL to app environment
-    [[environments.production.services.app.env]]
-      RAILWAY_SELENIUM_URL = "${{services.selenium.RAILWAY_PRIVATE_DOMAIN}}:4444/wd/hub"
+[[services]]
+name = "web"
