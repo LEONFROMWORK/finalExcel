@@ -13,6 +13,10 @@ bundle install
 echo "📦 Installing JavaScript dependencies..."
 npm install
 
+# Build Vite assets
+echo "🏗️  Building Vite assets..."
+npm run build || echo "⚠️  Vite build skipped"
+
 # Precompile assets
 echo "🎨 Precompiling assets..."
 bundle exec rails assets:precompile
