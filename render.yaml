@@ -3,10 +3,12 @@ services:
     name: excel-unified
     runtime: ruby
     buildCommand: ./bin/render-build.sh
-    startCommand: bundle exec rails server
+    startCommand: bundle exec puma -C config/puma.rb
     envVars:
       - key: DATABASE_URL
         sync: false  # Railway DB URL 수동 입력
+      - key: SECRET_KEY_BASE
+        generateValue: true
       - key: RAILS_MASTER_KEY
         sync: false
       - key: RAILS_ENV
