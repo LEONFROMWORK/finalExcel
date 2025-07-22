@@ -506,8 +506,10 @@ DEPENDENCIES
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
+  json
   mini_magick (~> 4.12)
   neighbor (~> 0.6.0)
+  net-http
   nokogiri (~> 1.16)
   omniauth (~> 2.1)
   omniauth-google-oauth2 (~> 1.2)

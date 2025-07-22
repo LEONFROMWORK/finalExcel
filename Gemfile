@@ -43,6 +43,8 @@ gem "bootsnap", require: false
 
 # Ruby 3.4+ compatibility
 gem "ostruct"
+gem "json"
+gem "net-http"
 
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 # gem "kamal", require: false
