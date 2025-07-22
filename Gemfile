@@ -107,7 +107,7 @@ gem "pgvector", "~> 0.3.2"
 gem "neighbor", "~> 0.6.0"
 
 # SQLite3 for Pipedata import
-gem "sqlite3", "~> 1.4"
+gem "sqlite3", "~> 2.7"
 
 # Redis for caching and background jobs
 gem "redis", "~> 5.0"
