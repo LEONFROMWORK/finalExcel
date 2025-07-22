@@ -1,12 +1,18 @@
 # frozen_string_literal: true
 
 # Start cleanup job for stale uploads
-if Rails.env.production? || Rails.env.development?
-  Rails.application.config.after_initialize do
-    # Start cleanup job after a delay
-    CleanupStaleUploadsJob.set(wait: 5.minutes).perform_later
-    
-    Rails.logger.info "Chunked upload cleanup job scheduled"
+# Skip during asset precompilation to avoid Redis dependency
+unless ENV['RAILS_PRECOMPILING'].present?
+  if Rails.env.production? || Rails.env.development?
+    Rails.application.config.after_initialize do
+      # Start cleanup job after a delay
+      begin
+        CleanupStaleUploadsJob.set(wait: 5.minutes).perform_later
+        Rails.logger.info "Chunked upload cleanup job scheduled"
+      rescue => e
+        Rails.logger.warn "Could not schedule cleanup job: #{e.message}"
+      end
+    end
   end
 end
 

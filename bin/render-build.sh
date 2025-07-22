@@ -11,13 +11,15 @@ npm install
 echo "🏗️ Building Vite assets..."
 npm run build
 
-# Skip Rails asset precompilation - we're using Vite
-echo "⏭️ Skipping Rails asset precompilation (using Vite)"
+# Create empty asset manifest to prevent Rails from trying to compile assets
+echo "📄 Creating empty asset manifest..."
+mkdir -p public/assets
+echo '{"files":{},"assets":{}}' > public/assets/.sprockets-manifest-$(openssl rand -hex 16).json
 
 # Run database migrations
 if [ -n "$DATABASE_URL" ]; then
   echo "🗄️ Running database migrations..."
-  bundle exec rails db:migrate
+  RAILS_PRECOMPILING=true bundle exec rails db:migrate
 else
   echo "⚠️ Skipping migrations (DATABASE_URL not set)"
 fi
