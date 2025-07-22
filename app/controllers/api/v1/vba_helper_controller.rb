@@ -4,7 +4,8 @@ module Api
   module V1
     # VBA 오류 해결 도우미 API
     class VbaHelperController < ApiController
-      skip_before_action :authenticate_user!, only: [:solve, :common_patterns]
+      # FREE TEST PERIOD - Authentication is already disabled in ApiController
+      # skip_before_action :authenticate_user!, only: [:solve, :common_patterns]
       
       # POST /api/v1/vba/solve
       # VBA 오류에 대한 해결책 제공
