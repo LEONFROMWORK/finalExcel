@@ -13,7 +13,7 @@ content = File.read(file_path)
 unless content.include?("def optimize_image_for_api")
   # Find the last method definition
   insertion_point = content.rindex(/^\s*def\s+\w+/)
-  
+
   if insertion_point
     # Insert before the detect_mime_type method
     method_def = <<~'RUBY'
@@ -67,7 +67,7 @@ RUBY
 
     # Insert the method
     new_content = content[0...insertion_point] + method_def + "\n" + content[insertion_point..-1]
-    
+
     File.write(file_path, new_content)
     puts "✅ Added optimize_image_for_api method"
   end
@@ -91,7 +91,7 @@ if content.include?("# Read image as base64 for API call")
       end
 RUBY
   )
-  
+
   File.write(file_path, updated_content)
   puts "✅ Updated enhance_with_openrouter to use image optimization"
 end
@@ -112,7 +112,7 @@ decoded = Base64.decode64(base64_content)
       end
 RUBY
   )
-  
+
   File.write(file_path, updated_content)
   puts "✅ Added base64 validation"
 end

@@ -16,12 +16,12 @@ class CreateCreditTransactions < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    
+
     # 인덱스 추가
     add_index :credit_transactions, :transaction_type
     add_index :credit_transactions, :status
-    add_index :credit_transactions, [:user_id, :created_at]
-    add_index :credit_transactions, [:user_id, :transaction_type]
+    add_index :credit_transactions, [ :user_id, :created_at ]
+    add_index :credit_transactions, [ :user_id, :transaction_type ]
     add_index :credit_transactions, :payment_transaction_id
   end
 end

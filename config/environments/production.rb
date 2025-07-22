@@ -48,10 +48,10 @@ Rails.application.configure do
 
   # Replace the default in-process memory cache store with a durable alternative.
   # Use Redis cache store if available, otherwise use memory store
-  if ENV['REDIS_URL'].present?
+  if ENV["REDIS_URL"].present?
     config.cache_store = :redis_cache_store, {
-      url: ENV['REDIS_URL'],
-      namespace: 'excel_unified_cache',
+      url: ENV["REDIS_URL"],
+      namespace: "excel_unified_cache",
       expires_in: 1.hour,
       pool: {
         size: ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i,
@@ -74,9 +74,9 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { 
-    host: ENV.fetch('APP_HOST', 'localhost'),
-    protocol: 'https'
+  config.action_mailer.default_url_options = {
+    host: ENV.fetch("APP_HOST", "localhost"),
+    protocol: "https"
   }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
@@ -105,7 +105,7 @@ Rails.application.configure do
   # ]
   #
   # DNS rebinding protection - add your production hosts
-  config.hosts << ENV['APP_HOST'] if ENV['APP_HOST'].present?
+  config.hosts << ENV["APP_HOST"] if ENV["APP_HOST"].present?
   # Example:
   # config.hosts << "excel-unified.onrender.com"
 

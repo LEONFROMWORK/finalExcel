@@ -14,10 +14,10 @@ class CreateReferralCodes < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    
+
     add_index :referral_codes, :code, unique: true
     add_index :referral_codes, :is_active
     add_index :referral_codes, :expires_at
-    add_index :referral_codes, [:user_id, :is_active]
+    add_index :referral_codes, [ :user_id, :is_active ]
   end
 end

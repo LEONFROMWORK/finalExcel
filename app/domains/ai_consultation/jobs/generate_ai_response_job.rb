@@ -12,14 +12,14 @@ module AiConsultation
 
         # 통합 AI 서비스 사용
         ai_service = UnifiedAiService.new(@user)
-        
+
         # AI 응답 생성
         result = ai_service.process_chat_message(@chat_session, @user_message.content)
-        
+
         if result[:success]
           # 성공 시 이미 메시지가 생성됨
           Rails.logger.info "AI response generated successfully using #{result[:result][:model_used]}"
-          
+
           # 코드 실행이 필요한 경우 별도 처리
           if result[:result][:code_snippets]&.any?
             process_code_suggestions(@chat_session, result[:result][:code_snippets])
@@ -30,7 +30,7 @@ module AiConsultation
             "죄송합니다. AI 응답 생성 중 오류가 발생했습니다: #{result[:errors]&.join(', ') || result[:error]}",
             {
               error: true,
-              errors: result[:errors] || [result[:error]]
+              errors: result[:errors] || [ result[:error] ]
             }
           )
         end
@@ -96,18 +96,30 @@ module AiConsultation
           base_prompt = "이 Excel 스크린샷을 분석해주세요."
         end
 
-        # In production, this would call OpenAI's vision API or similar
-        mock_analysis = <<~RESPONSE
-          업로드하신 이미지를 분석했습니다.
+        # Use real AI vision service in production
+        if Rails.env.production? || ENV["USE_REAL_AI"] == "true"
+          llm_service = ::LLMService.new
+          image_url = @user_message.image_url
 
-          [이미지 분석 결과]
-          - Excel 스프레드시트가 포함된 것으로 보입니다
-          - 데이터 구조와 수식을 확인했습니다
+          llm_service.analyze_image_with_context(
+            image_url: image_url,
+            context: context,
+            query: base_prompt
+          )
+        else
+          # Development/Test: Mock response
+          mock_analysis = <<~RESPONSE
+            업로드하신 이미지를 분석했습니다.
 
-          구체적인 질문이나 도움이 필요한 부분이 있으시면 말씀해주세요.
-        RESPONSE
+            [이미지 분석 결과]
+            - Excel 스프레드시트가 포함된 것으로 보입니다
+            - 데이터 구조와 수식을 확인했습니다
 
-        mock_analysis
+            구체적인 질문이나 도움이 필요한 부분이 있으시면 말씀해주세요.
+          RESPONSE
+
+          mock_analysis
+        end
       end
 
       def generate_text_response(context)
@@ -242,12 +254,12 @@ module AiConsultation
         # Simple token estimation (actual implementation would use tiktoken or similar)
         content.split.size * 1.3
       end
-      
+
       def process_code_suggestions(chat_session, code_snippets)
         # 코드 제안이 있을 때 처리
         code_snippets.each do |snippet|
           # 코드 실행 가능 여부 확인
-          if snippet[:language] == 'python' && snippet[:code].present?
+          if snippet[:language] == "python" && snippet[:code].present?
             # 향후 Jupyter 커널 통합 시 실행
             Rails.logger.info "Code suggestion available for execution: #{snippet[:purpose]}"
           end

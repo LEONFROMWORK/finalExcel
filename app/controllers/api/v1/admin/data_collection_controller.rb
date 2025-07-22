@@ -10,7 +10,7 @@ module Api
         def index
           # Get all collection tasks with stats
           tasks = DataPipeline::CollectionTask.includes(:collection_runs).all
-          
+
           render json: {
             platforms: available_platforms,
             tasks: serialize_tasks(tasks)
@@ -21,9 +21,9 @@ module Api
           # Create a new collection task for selected platforms
           platforms = params[:platforms] || []
           platforms = platforms & available_platforms.keys # Ensure valid platforms
-          
+
           if platforms.empty?
-            render json: { error: '최소 하나의 플랫폼을 선택해주세요' }, status: :unprocessable_entity
+            render json: { error: "최소 하나의 플랫폼을 선택해주세요" }, status: :unprocessable_entity
             return
           end
 
@@ -31,15 +31,15 @@ module Api
           platforms.each do |platform|
             task = DataPipeline::CollectionTask.create!(
               name: "#{platform.capitalize} Data Collection - #{Time.current.strftime('%Y%m%d')}",
-              task_type: 'web_scraping',
+              task_type: "web_scraping",
               source_config: {
-                'url' => platform_config(platform)[:base_url] || platform,
-                'platform' => platform,
-                'enable_image_analysis' => params[:enable_image_analysis] || false
+                "url" => platform_config(platform)[:base_url] || platform,
+                "platform" => platform,
+                "enable_image_analysis" => params[:enable_image_analysis] || false
               },
               schedule_config: {
-                'frequency' => params[:frequency] || 'manual',
-                'limit' => params[:limit] || 10
+                "frequency" => params[:frequency] || "manual",
+                "limit" => params[:limit] || 10
               },
               user: current_user,
               enabled: true
@@ -55,13 +55,13 @@ module Api
 
         def run_collection
           task = DataPipeline::CollectionTask.find(params[:id])
-          
+
           # Create and execute collection run
           collection_service = DataPipeline::Services::CollectionService.new(task)
           run = collection_service.execute
-          
+
           render json: {
-            message: '수집이 시작되었습니다',
+            message: "수집이 시작되었습니다",
             run_id: run.id,
             status: run.status
           }
@@ -72,12 +72,12 @@ module Api
           platforms = params[:platforms] || []
           platforms = platforms & available_platforms.keys # 유효한 플랫폼만
           limit = params[:limit] || 10
-          
+
           if platforms.empty?
-            render json: { error: '최소 하나의 플랫폼을 선택해주세요' }, status: :unprocessable_entity
+            render json: { error: "최소 하나의 플랫폼을 선택해주세요" }, status: :unprocessable_entity
             return
           end
-          
+
           # BulkCollectionService를 사용하여 동시 수집
           service = DataPipeline::BulkCollectionService.new
           result = service.call(
@@ -85,18 +85,18 @@ module Api
             limit: limit,
             user: current_user
           )
-          
+
           if result.success?
             # 부분 성공/전체 성공/전체 실패에 따라 다른 HTTP 상태 코드 반환
             status_code = case result.data[:status]
-                         when 'all_succeeded'
+            when "all_succeeded"
                            :ok
-                         when 'partial_success'
+            when "partial_success"
                            :multi_status  # 207 Multi-Status
-                         else
+            else
                            :unprocessable_entity
-                         end
-            
+            end
+
             render json: {
               status: result.data[:status],
               message: result.data[:message],
@@ -105,9 +105,9 @@ module Api
               failed_platforms: result.data[:failed_platforms]
             }, status: status_code
           else
-            render json: { 
+            render json: {
               error: result.error,
-              message: '다중 플랫폼 수집 중 오류가 발생했습니다'
+              message: "다중 플랫폼 수집 중 오류가 발생했습니다"
             }, status: :internal_server_error
           end
         end
@@ -131,7 +131,7 @@ module Api
               total: KnowledgeBase::QaPair.where(source: platform).count,
               approved: KnowledgeBase::QaPair.where(source: platform, is_approved: true).count,
               with_images: KnowledgeBase::QaPair.where(source: platform)
-                .where("metadata->>'has_images' = ?", 'true').count
+                .where("metadata->>'has_images' = ?", "true").count
             }
           end
 
@@ -141,43 +141,43 @@ module Api
         def download_data
           # Download collected data
           platform = params[:platform]
-          format = params[:format] || 'json'
-          
+          format = params[:format] || "json"
+
           qa_pairs = if platform.present?
                       KnowledgeBase::QaPair.where(source: platform)
-                    else
+          else
                       KnowledgeBase::QaPair.all
-                    end
+          end
 
           case format
-          when 'json'
+          when "json"
             send_data qa_pairs.to_json(include_embeddings: false),
                      filename: "qa_export_#{Time.current.strftime('%Y%m%d_%H%M%S')}.json",
-                     type: 'application/json'
-          when 'csv'
+                     type: "application/json"
+          when "csv"
             csv_data = generate_csv(qa_pairs)
             send_data csv_data,
                      filename: "qa_export_#{Time.current.strftime('%Y%m%d_%H%M%S')}.csv",
-                     type: 'text/csv'
+                     type: "text/csv"
           else
-            render json: { error: '지원하지 않는 형식입니다' }, status: :unprocessable_entity
+            render json: { error: "지원하지 않는 형식입니다" }, status: :unprocessable_entity
           end
         end
 
         def send_to_rag
           # Send data to RAG AI search system
           platform = params[:platform]
-          
+
           qa_pairs = if platform.present?
                       KnowledgeBase::QaPair.where(source: platform, is_approved: true)
-                    else
+          else
                       KnowledgeBase::QaPair.where(is_approved: true)
-                    end
+          end
 
           # Export to RAG format
           exporter = DataExportService.new
           result = exporter.export_for_rag(qa_pairs)
-          
+
           if result[:success]
             render json: {
               message: "#{result[:count]}개의 Q&A가 RAG 시스템으로 전송되었습니다",
@@ -192,7 +192,7 @@ module Api
 
         def authenticate_admin!
           unless current_user&.admin?
-            render json: { error: '관리자 권한이 필요합니다' }, status: :forbidden
+            render json: { error: "관리자 권한이 필요합니다" }, status: :forbidden
           end
         end
 
@@ -205,15 +205,19 @@ module Api
         end
 
         def serialize_tasks(tasks)
-          tasks.map do |task|
+          # Preload associations to avoid N+1 queries
+          tasks_with_runs = tasks.includes(:collection_runs)
+
+          tasks_with_runs.map do |task|
+            runs = task.collection_runs.to_a
             {
               id: task.id,
               name: task.name,
-              platform: task.source_config['platform'],
+              platform: task.source_config["platform"],
               enabled: task.enabled,
-              last_run: task.collection_runs.order(created_at: :desc).first&.created_at,
-              run_count: task.collection_runs.count,
-              success_count: task.collection_runs.where(status: 'completed').count,
+              last_run: runs.max_by(&:created_at)&.created_at,
+              run_count: runs.size,
+              success_count: runs.count { |r| r.status == "completed" },
               created_at: task.created_at
             }
           end
@@ -223,32 +227,32 @@ module Api
           {
             id: run.id,
             task_name: run.collection_task.name,
-            platform: run.collection_task.source_config['platform'],
+            platform: run.collection_task.source_config["platform"],
             status: run.status,
-            items_collected: run.result_summary&.dig('items_collected') || 0,
+            items_collected: run.result_summary&.dig("items_collected") || 0,
             started_at: run.started_at,
             completed_at: run.completed_at,
-            duration: run.completed_at && run.started_at ? 
+            duration: run.completed_at && run.started_at ?
                      (run.completed_at - run.started_at).round : nil
           }
         end
 
         def generate_csv(qa_pairs)
-          require 'csv'
-          
+          require "csv"
+
           CSV.generate do |csv|
-            csv << ['ID', 'Question', 'Answer', 'Source', 'Tags', 'Quality Score', 'Approved', 'Created At']
-            
+            csv << [ "ID", "Question", "Answer", "Source", "Tags", "Quality Score", "Approved", "Created At" ]
+
             qa_pairs.each do |qa|
               csv << [
                 qa.id,
                 qa.question,
                 qa.answer,
                 qa.source,
-                qa.tags.join(', '),
+                qa.tags.join(", "),
                 qa.quality_score,
-                qa.is_approved ? 'Yes' : 'No',
-                qa.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                qa.is_approved ? "Yes" : "No",
+                qa.created_at.strftime("%Y-%m-%d %H:%M:%S")
               ]
             end
           end

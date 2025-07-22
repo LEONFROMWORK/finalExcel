@@ -2,7 +2,7 @@
 
 # Start cleanup job for stale uploads
 # Skip during asset precompilation to avoid Redis dependency
-unless ENV['RAILS_PRECOMPILING'].present?
+unless ENV["RAILS_PRECOMPILING"].present?
   if Rails.env.production? || Rails.env.development?
     Rails.application.config.after_initialize do
       # Start cleanup job after a delay

@@ -30,7 +30,7 @@ module KnowledgeBase
     def self.search_similar(query_embedding, limit: 5, threshold: 0.8)
       # Use raw SQL for better performance with pgvector
       sql = <<-SQL
-        SELECT qa_pairs.*, 
+        SELECT qa_pairs.*,#{' '}
                (embedding <=> CAST(? AS vector)) AS distance
         FROM qa_pairs
         WHERE approved = true
@@ -39,8 +39,8 @@ module KnowledgeBase
         ORDER BY embedding <=> CAST(? AS vector)
         LIMIT ?
       SQL
-      
-      find_by_sql([sql, query_embedding, threshold, query_embedding, limit])
+
+      find_by_sql([ sql, query_embedding, threshold, query_embedding, limit ])
     end
 
     def self.search_by_text(query)

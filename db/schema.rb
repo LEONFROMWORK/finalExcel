@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_22_055352) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_22_100319) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -82,6 +82,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_22_055352) do
     t.datetime "updated_at", null: false
     t.index ["chat_session_id"], name: "index_chat_messages_on_chat_session_id"
     t.index ["created_at"], name: "index_chat_messages_on_created_at"
+    t.index ["role"], name: "index_chat_messages_on_role"
   end
 
   create_table "chat_sessions", force: :cascade do |t|
@@ -351,6 +352,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_22_055352) do
     t.string "transaction_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_referral_rewards_on_created_at"
     t.index ["referral_code_id"], name: "index_referral_rewards_on_referral_code_id"
     t.index ["referred_id", "referral_code_id"], name: "index_referral_rewards_on_referred_id_and_referral_code_id", unique: true
     t.index ["referred_id"], name: "index_referral_rewards_on_referred_id"

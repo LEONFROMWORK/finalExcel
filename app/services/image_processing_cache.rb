@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'digest'
+require "digest"
 
 ##
 # Local cache service for image processing results
@@ -29,7 +29,7 @@ class ImageProcessingCache
 
   # Get cached image processing result
   def get_image_processing_result(image_url, processing_type)
-    key = generate_key('img_proc', {
+    key = generate_key("img_proc", {
       url: image_url,
       type: processing_type
     })
@@ -38,7 +38,7 @@ class ImageProcessingCache
 
   # Cache image processing result
   def cache_image_processing_result(image_url, processing_type, result)
-    key = generate_key('img_proc', {
+    key = generate_key("img_proc", {
       url: image_url,
       type: processing_type
     })
@@ -47,7 +47,7 @@ class ImageProcessingCache
 
   # Get cached OpenRouter API response
   def get_openrouter_response(model, messages, image_url)
-    key = generate_key('openrouter', {
+    key = generate_key("openrouter", {
       model: model,
       messages: messages,
       image_url: image_url
@@ -57,7 +57,7 @@ class ImageProcessingCache
 
   # Cache OpenRouter API response
   def cache_openrouter_response(model, messages, image_url, response)
-    key = generate_key('openrouter', {
+    key = generate_key("openrouter", {
       model: model,
       messages: messages,
       image_url: image_url
@@ -67,7 +67,7 @@ class ImageProcessingCache
 
   # Get cached Stack Overflow API response
   def get_stackoverflow_response(endpoint, params)
-    key = generate_key('so_api', {
+    key = generate_key("so_api", {
       endpoint: endpoint,
       params: params
     })
@@ -76,7 +76,7 @@ class ImageProcessingCache
 
   # Cache Stack Overflow API response
   def cache_stackoverflow_response(endpoint, params, response)
-    key = generate_key('so_api', {
+    key = generate_key("so_api", {
       endpoint: endpoint,
       params: params
     })

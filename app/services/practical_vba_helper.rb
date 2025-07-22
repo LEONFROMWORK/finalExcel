@@ -19,7 +19,7 @@ class PracticalVbaHelper
         Dim ws As Worksheet
         Set ws = ThisWorkbook.Worksheets("Sheet1")
         ws.Range("A1:B10").Value = "데이터"
-        
+
         ' 보호 해제 예시
         If ws.ProtectContents Then
           ws.Unprotect Password:="yourpassword"
@@ -27,7 +27,7 @@ class PracticalVbaHelper
       VBA
       confidence: 0.9
     },
-    
+
     "9" => {
       message: "실행 시간 오류 '9': 첨자가 범위를 벗어났습니다",
       solutions: [
@@ -42,7 +42,7 @@ class PracticalVbaHelper
         On Error Resume Next
         Set ws = Worksheets("SheetName")
         On Error GoTo 0
-        
+
         If Not ws Is Nothing Then
           ws.Activate
         Else
@@ -51,7 +51,7 @@ class PracticalVbaHelper
       VBA
       confidence: 0.95
     },
-    
+
     "13" => {
       message: "실행 시간 오류 '13': 형식이 일치하지 않습니다",
       solutions: [
@@ -64,9 +64,9 @@ class PracticalVbaHelper
         ' 타입 안전한 변환
         Dim userInput As String
         Dim numValue As Double
-        
+
         userInput = InputBox("숫자를 입력하세요")
-        
+
         If IsNumeric(userInput) Then
           numValue = CDbl(userInput)
         Else
@@ -75,7 +75,7 @@ class PracticalVbaHelper
       VBA
       confidence: 0.9
     },
-    
+
     "424" => {
       message: "실행 시간 오류 '424': 개체가 필요합니다",
       solutions: [
@@ -88,11 +88,11 @@ class PracticalVbaHelper
         ' 올바른 개체 할당
         Dim ws As Worksheet
         Dim rng As Range
-        
+
         ' Set 키워드 필수
         Set ws = ActiveSheet
         Set rng = ws.Range("A1:B10")
-        
+
         ' 사용 전 Nothing 체크
         If Not rng Is Nothing Then
           rng.Value = "데이터"
@@ -100,7 +100,7 @@ class PracticalVbaHelper
       VBA
       confidence: 0.85
     },
-    
+
     "91" => {
       message: "실행 시간 오류 '91': 개체 변수 또는 With 블록 변수가 설정되지 않았습니다",
       solutions: [
@@ -113,7 +113,7 @@ class PracticalVbaHelper
         ' Find 메서드 안전 사용
         Dim foundCell As Range
         Set foundCell = Range("A1:A100").Find("검색어")
-        
+
         If Not foundCell Is Nothing Then
           foundCell.Interior.Color = vbYellow
         Else
@@ -122,7 +122,7 @@ class PracticalVbaHelper
       VBA
       confidence: 0.85
     },
-    
+
     "438" => {
       message: "실행 시간 오류 '438': 개체가 이 속성 또는 메서드를 지원하지 않습니다",
       solutions: [
@@ -135,16 +135,16 @@ class PracticalVbaHelper
         ' 올바른 개체 사용 예시
         Dim ws As Worksheet
         Set ws = ActiveSheet
-        
+
         ' Worksheet 개체의 올바른 속성
         ws.Name = "NewName"
         ws.Visible = xlSheetVisible
-        
+
         ' 잘못된 예: ws.Text (존재하지 않는 속성)
       VBA
       confidence: 0.8
     },
-    
+
     "6" => {
       message: "실행 시간 오류 '6': 오버플로",
       solutions: [
@@ -157,13 +157,13 @@ class PracticalVbaHelper
         ' 오버플로 방지
         Dim bigNumber As Long  ' Integer 대신 Long 사용
         Dim result As Double   ' 큰 계산 결과용
-        
+
         bigNumber = 100000
         result = CDbl(bigNumber) * 1000  ' CDbl로 안전하게 변환
       VBA
       confidence: 0.85
     },
-    
+
     "error 1004 copy" => {
       message: "복사/붙여넣기 관련 1004 오류",
       solutions: [
@@ -176,17 +176,17 @@ class PracticalVbaHelper
         ' 안전한 복사/붙여넣기
         Dim sourceRange As Range
         Dim destRange As Range
-        
+
         Set sourceRange = Sheet1.Range("A1:B10")
         Set destRange = Sheet2.Range("C1")
-        
+
         sourceRange.Copy
         destRange.PasteSpecial xlPasteValues
         Application.CutCopyMode = False
       VBA
       confidence: 0.85
     },
-    
+
     "compile error" => {
       message: "컴파일 오류",
       solutions: [
@@ -198,11 +198,11 @@ class PracticalVbaHelper
       example_code: <<~VBA,
         ' 올바른 코드 구조
         Option Explicit
-        
+
         Sub MyProcedure()
           Dim i As Long
           Dim ws As Worksheet
-          
+        #{'  '}
           Set ws = ActiveSheet
           For i = 1 To 10
             ws.Cells(i, 1).Value = i
@@ -211,7 +211,7 @@ class PracticalVbaHelper
       VBA
       confidence: 0.8
     },
-    
+
     "byref argument type" => {
       message: "ByRef 인수 형식이 일치하지 않습니다",
       solutions: [
@@ -227,7 +227,7 @@ class PracticalVbaHelper
           num = 100
           Call ProcessNumber(num)  ' Long 타입 전달
         End Sub
-        
+
         Sub ProcessNumber(ByVal value As Long)  ' ByVal 사용
           Debug.Print value * 2
         End Sub
@@ -235,7 +235,7 @@ class PracticalVbaHelper
       confidence: 0.8
     }
   }.freeze
-  
+
   # 성능 관련 키워드 패턴
   PERFORMANCE_KEYWORDS = {
     "slow" => {
@@ -250,9 +250,9 @@ class PracticalVbaHelper
           Application.ScreenUpdating = False
           Application.Calculation = xlCalculationManual
           Application.EnableEvents = False
-          
+        #{'  '}
           ' 여기에 작업 코드
-          
+        #{'  '}
           Application.EnableEvents = True
           Application.Calculation = xlCalculationAutomatic
           Application.ScreenUpdating = True
@@ -270,32 +270,32 @@ class PracticalVbaHelper
         Sheets("Sheet1").Select
         Range("A1").Select
         Selection.Value = 100
-        
+
         ' 좋은 예
         Sheets("Sheet1").Range("A1").Value = 100
       VBA
     }
   }.freeze
-  
+
   def solve(error_description)
     return { error: "오류 설명을 입력해주세요" } if error_description.blank?
-    
+
     # 1단계: 즉시 해결 가능한지 확인
     instant_solution = find_instant_solution(error_description)
     return format_response(instant_solution, :exact_match) if instant_solution
-    
+
     # 2단계: 성능 관련 키워드 매칭
     performance_solution = find_performance_solution(error_description)
     return format_response(performance_solution, :performance) if performance_solution
-    
+
     # 3단계: 간단한 키워드 매칭
     keyword_solution = find_by_keywords(error_description)
     return format_response(keyword_solution, :keyword_match) if keyword_solution
-    
+
     # 4단계: 기본 가이드 제공
     generic_guide(error_description)
   end
-  
+
   def get_common_patterns
     # 자주 사용되는 패턴 반환 (UI에서 빠른 선택용)
     INSTANT_SOLUTIONS.map do |key, solution|
@@ -306,26 +306,26 @@ class PracticalVbaHelper
       }
     end.sort_by { |p| -p[:confidence] }.take(5)
   end
-  
+
   private
-  
+
   def find_instant_solution(error)
     error_lower = error.downcase
-    
+
     INSTANT_SOLUTIONS.each do |key, solution|
       # 오류 번호나 키워드가 포함되어 있는지 확인
-      if error_lower.include?(key.downcase) || 
+      if error_lower.include?(key.downcase) ||
          (solution[:message] && error_lower.include?(solution[:message].downcase[0..20]))
         return solution
       end
     end
-    
+
     nil
   end
-  
+
   def find_performance_solution(error)
     error_lower = error.downcase
-    
+
     PERFORMANCE_KEYWORDS.each do |keyword, solution|
       if error_lower.include?(keyword)
         return {
@@ -336,13 +336,13 @@ class PracticalVbaHelper
         }
       end
     end
-    
+
     nil
   end
-  
+
   def find_by_keywords(error)
     error_lower = error.downcase
-    
+
     # 추가 키워드 매칭
     case error_lower
     when /loop|for|while/
@@ -382,7 +382,7 @@ class PracticalVbaHelper
       nil
     end
   end
-  
+
   def format_response(solution, match_type)
     {
       success: true,
@@ -394,7 +394,7 @@ class PracticalVbaHelper
       need_ai_help: solution[:confidence] < 0.7
     }
   end
-  
+
   def generic_guide(error)
     {
       success: true,
@@ -409,12 +409,12 @@ class PracticalVbaHelper
       example_code: <<~VBA,
         Sub DebugExample()
           On Error GoTo ErrorHandler
-          
+        #{'  '}
           ' 디버깅용 출력
           Debug.Print "시작: " & Now
-          
+        #{'  '}
           ' 여기에 문제가 있는 코드
-          
+        #{'  '}
           Exit Sub
         ErrorHandler:
           MsgBox "오류 발생: " & Err.Description

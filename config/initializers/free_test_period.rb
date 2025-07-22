@@ -7,7 +7,7 @@ Rails.application.config.free_test_period = {
   enabled: true,
   start_date: Date.new(2025, 7, 22),
   end_date: Date.new(2025, 10, 22),
-  
+
   # Disabled features
   features: {
     authentication: false,
@@ -18,7 +18,7 @@ Rails.application.config.free_test_period = {
     credits_system: false,
     notifications: false
   },
-  
+
   # Public features (no login required)
   public_features: {
     excel_analysis: true,
@@ -27,12 +27,12 @@ Rails.application.config.free_test_period = {
     vba_helper: true,
     data_collection: true
   },
-  
+
   # Test user for API requests (no actual authentication)
   test_user: {
     id: 1,
-    email: 'test@excelunified.com',
-    name: 'Test User',
+    email: "test@excelunified.com",
+    name: "Test User",
     credits: 999999
   }
 }

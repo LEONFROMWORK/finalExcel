@@ -14,7 +14,7 @@ puts "✅ Cache cleared"
 date_str = Date.current.strftime('%Y%m%d')
 export_dir = Rails.root.join('tmp', 'platform_datasets')
 
-['stackoverflow', 'reddit', 'mrexcel', 'oppadu'].each do |platform|
+[ 'stackoverflow', 'reddit', 'mrexcel', 'oppadu' ].each do |platform|
   filename = "#{platform}_dataset_#{date_str}.json"
   filepath = export_dir.join(filename)
   if File.exist?(filepath)
@@ -37,27 +37,27 @@ total_with_images = 0
 
 collections.each do |config|
   puts "\n🌐 Collecting #{config[:limit]} items from #{config[:platform].capitalize}..."
-  
+
   collector = PlatformDataCollector.new(config[:platform])
   result = collector.collect_data(config[:limit])
-  
+
   if result[:success]
     puts "✅ Collected #{result[:results].size} items"
-    
+
     # Count items with images
     items_with_images = result[:results].count { |item| item[:images]&.any? }
     puts "📸 Items with images: #{items_with_images}"
-    
+
     total_collected += result[:results].size
     total_with_images += items_with_images
-    
+
     if result[:save_status]
       puts "📁 Saved to: #{File.basename(result[:save_status][:filepath])}"
     end
   else
     puts "❌ Failed: #{result[:error]}"
   end
-  
+
   # Brief pause between platforms
   sleep(2)
 end

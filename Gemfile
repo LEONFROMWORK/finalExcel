@@ -59,7 +59,7 @@ gem "mini_magick", "~> 4.12"
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
-  
+
   # .env file support
   gem "dotenv-rails"
 
@@ -132,3 +132,5 @@ gem "chunky_png", "~> 1.4"     # Pure Ruby image analysis
 gem "selenium-webdriver", "~> 4.27" # For Railway deployment and Oppadu scraping
 
 gem "playwright-ruby-client", "~> 1.54"
+
+gem "jwt", "~> 3.1"

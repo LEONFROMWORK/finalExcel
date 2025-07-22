@@ -18,13 +18,13 @@ class CreateUserActivities < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    
+
     # 인덱스 추가
     add_index :user_activities, :action
     add_index :user_activities, :started_at
     add_index :user_activities, :session_id
-    add_index :user_activities, [:user_id, :started_at]
-    add_index :user_activities, [:action, :success]
+    add_index :user_activities, [ :user_id, :started_at ]
+    add_index :user_activities, [ :action, :success ]
     add_index :user_activities, :created_at
   end
 end

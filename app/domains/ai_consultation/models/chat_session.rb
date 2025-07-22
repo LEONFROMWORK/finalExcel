@@ -3,7 +3,7 @@
 module AiConsultation
   class ChatSession < ApplicationRecord
     # Associations
-    belongs_to :user, class_name: "Authentication::User"
+    belongs_to :user
     has_many :messages, -> { order(created_at: :asc) },
              class_name: "ChatMessage",
              dependent: :destroy

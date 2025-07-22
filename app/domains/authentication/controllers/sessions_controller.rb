@@ -42,9 +42,11 @@ module Authentication
     end
 
     def generate_jwt_token(user)
-      # JWT token generation logic
-      # This is a placeholder - implement proper JWT
-      SecureRandom.hex(32)
+      JwtService.encode({
+        user_id: user.id,
+        email: user.email,
+        role: user.role
+      })
     end
   end
 end

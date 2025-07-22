@@ -7,7 +7,7 @@ class AddFieldsToCollectionTasks < ActiveRecord::Migration[8.0]
     add_column :collection_tasks, :started_at, :datetime
     add_column :collection_tasks, :completed_at, :datetime
     add_column :collection_tasks, :user_id, :bigint
-    
+
     # Add indexes
     add_index :collection_tasks, :platform
     add_index :collection_tasks, :user_id

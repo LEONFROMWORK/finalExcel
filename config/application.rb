@@ -27,10 +27,10 @@ module RailsApp
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
-    
+
     # Add domains and shared to autoload paths
-    config.autoload_paths << Rails.root.join('app/domains')
-    config.autoload_paths << Rails.root.join('app/shared')
+    config.autoload_paths << Rails.root.join("app/domains")
+    config.autoload_paths << Rails.root.join("app/shared")
 
     # Configuration for the application, engines, and railties goes here.
     #

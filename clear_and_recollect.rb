@@ -10,11 +10,11 @@ begin
   qa_count = KnowledgeBase::QaPair.count
   KnowledgeBase::QaPair.destroy_all
   puts "✅ Deleted #{qa_count} QA pairs"
-  
+
   # Clear any cached data
   Rails.cache.clear
   puts "✅ Cleared Rails cache"
-  
+
 rescue => e
   puts "❌ Error clearing data: #{e.message}"
   exit 1
@@ -24,7 +24,7 @@ puts "\n📊 Starting fresh collection from all platforms (20 items each)..."
 puts "=" * 60
 
 # Define platforms
-platforms = ['stackoverflow', 'reddit', 'mrexcel', 'oppadu']
+platforms = [ 'stackoverflow', 'reddit', 'mrexcel', 'oppadu' ]
 limit = 20
 total_success = 0
 results_summary = {}
@@ -33,11 +33,11 @@ results_summary = {}
 platforms.each do |platform|
   puts "\n🌐 Collecting from #{platform.upcase}..."
   puts "-" * 40
-  
+
   begin
     collector = PlatformDataCollector.new(platform)
     result = collector.collect_data(limit)
-    
+
     if result[:success]
       count = result[:results].size
       total_success += count
@@ -46,9 +46,9 @@ platforms.each do |platform|
         count: count,
         has_images: result[:results].any? { |r| r[:images].present? && r[:images].any? }
       }
-      
+
       puts "✅ Successfully collected #{count} items from #{platform}"
-      
+
       # Show sample of first item
       if result[:results].any?
         first = result[:results].first
@@ -62,7 +62,7 @@ platforms.each do |platform|
       }
       puts "❌ Failed to collect from #{platform}: #{result[:error]}"
     end
-    
+
   rescue => e
     results_summary[platform] = {
       success: false,
@@ -70,7 +70,7 @@ platforms.each do |platform|
     }
     puts "❌ Error collecting from #{platform}: #{e.message}"
   end
-  
+
   # Small delay between platforms
   sleep 2
 end

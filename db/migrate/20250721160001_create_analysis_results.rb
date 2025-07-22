@@ -8,10 +8,10 @@ class CreateAnalysisResults < ActiveRecord::Migration[8.0]
       t.text :summary
       t.integer :credits_used, default: 0
       t.datetime :completed_at
-      
+
       t.timestamps
     end
-    
+
     add_index :analysis_results, :status
     add_index :analysis_results, :analysis_type
   end

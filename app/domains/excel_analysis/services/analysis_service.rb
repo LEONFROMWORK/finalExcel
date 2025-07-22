@@ -49,37 +49,37 @@ module ExcelAnalysis
 
       def call_python_service
         # Get the file path
-        file_path = if excel_file.file_url.start_with?('/')
-                      Rails.root.join('tmp', 'uploads', File.basename(excel_file.file_url))
-                    else
+        file_path = if excel_file.file_url.start_with?("/")
+                      Rails.root.join("tmp", "uploads", File.basename(excel_file.file_url))
+        else
                       ActiveStorage::Blob.service.path_for(excel_file.file_url)
-                    end
-        
+        end
+
         # Call Python service
         python_client = PythonServiceClient.new
         result = python_client.analyze_excel(file_path)
-        
+
         # Transform Python service response to expected format
         {
-          rows: result.dig('file_analysis', 'summary', 'total_rows') || 0,
-          columns: result.dig('file_analysis', 'summary', 'total_columns') || 0,
-          sheets: result.dig('file_analysis', 'summary', 'total_sheets') || 0,
-          formulas_count: result.dig('file_analysis', 'summary', 'total_formulas') || 0,
-          errors: transform_errors(result.dig('file_analysis', 'errors') || []),
-          data_types: result.dig('file_analysis', 'data_types') || {},
-          complex_formulas: result.dig('file_analysis', 'formulas', 'complex') || 0,
-          simple_formulas: result.dig('file_analysis', 'formulas', 'simple') || 0,
-          empty_cells: result.dig('file_analysis', 'summary', 'empty_cells') || 0,
-          unique_values: result.dig('file_analysis', 'summary', 'unique_values') || 0
+          rows: result.dig("file_analysis", "summary", "total_rows") || 0,
+          columns: result.dig("file_analysis", "summary", "total_columns") || 0,
+          sheets: result.dig("file_analysis", "summary", "total_sheets") || 0,
+          formulas_count: result.dig("file_analysis", "summary", "total_formulas") || 0,
+          errors: transform_errors(result.dig("file_analysis", "errors") || []),
+          data_types: result.dig("file_analysis", "data_types") || {},
+          complex_formulas: result.dig("file_analysis", "formulas", "complex") || 0,
+          simple_formulas: result.dig("file_analysis", "formulas", "simple") || 0,
+          empty_cells: result.dig("file_analysis", "summary", "empty_cells") || 0,
+          unique_values: result.dig("file_analysis", "summary", "unique_values") || 0
         }
       end
-      
+
       def transform_errors(errors)
         errors.map do |error|
           {
-            type: error['error_type'],
-            count: error['count'] || 1,
-            cells: error['locations'] || []
+            type: error["error_type"],
+            count: error["count"] || 1,
+            cells: error["locations"] || []
           }
         end
       end

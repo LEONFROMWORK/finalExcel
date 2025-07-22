@@ -11,10 +11,8 @@ module DataPipeline
         query = query.where(task_type: options[:task_type]) if options[:task_type].present?
         query = query.where(created_by_id: options[:user_id]) if options[:user_id].present?
 
-        # Apply ordering
-        order_by = options[:order_by] || "created_at"
-        order_dir = options[:order_dir] || "desc"
-        query = query.order("#{order_by} #{order_dir}")
+        # Apply ordering - Secure implementation with whitelisting
+        query = apply_secure_ordering(query, options[:order_by], options[:order_dir])
 
         # Apply pagination
         limit = options[:limit] || 20
@@ -126,6 +124,21 @@ module DataPipeline
         CollectionRun.where("created_at < ?", cutoff_date)
                      .where(status: [ :completed, :failed, :cancelled ])
                      .destroy_all
+      end
+
+      private
+
+      # Whitelist allowed columns and directions to prevent SQL injection
+      ALLOWED_ORDER_COLUMNS = %w[created_at updated_at name status task_type schedule].freeze
+      ALLOWED_ORDER_DIRECTIONS = %w[asc desc].freeze
+
+      def apply_secure_ordering(query, order_by, order_dir)
+        # Validate and sanitize ordering parameters
+        order_column = ALLOWED_ORDER_COLUMNS.include?(order_by) ? order_by : "created_at"
+        order_direction = ALLOWED_ORDER_DIRECTIONS.include?(order_dir&.downcase) ? order_dir.downcase : "desc"
+
+        # Use hash syntax for secure ordering
+        query.order(order_column => order_direction)
       end
     end
   end

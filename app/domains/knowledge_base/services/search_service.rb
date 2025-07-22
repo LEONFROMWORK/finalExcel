@@ -18,19 +18,19 @@ module KnowledgeBase
         # Use optimized search service
         search_mode = if options[:use_semantic_search]
                         :semantic
-                      elsif options[:use_hybrid_search]
+        elsif options[:use_hybrid_search]
                         :hybrid
-                      else
+        else
                         :text
-                      end
-        
+        end
+
         optimized_search = OptimizedSearchService.new(query, {
           mode: search_mode,
           limit: options[:limit],
           quality_threshold: options[:quality_threshold],
           rerank: options[:rerank] != false
         })
-        
+
         results = optimized_search.search
 
         success(format_results(results), message: "Search completed")

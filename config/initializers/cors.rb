@@ -9,25 +9,25 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins 'http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'
-    
-    resource '*',
+    origins "http://localhost:5173", "http://localhost:3000", "http://localhost:3001"
+
+    resource "*",
       headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head],
+      methods: [ :get, :post, :put, :patch, :delete, :options, :head ],
       credentials: true,
-      expose: ['Authorization']
+      expose: [ "Authorization" ]
   end
-  
+
   # Production configuration
   if Rails.env.production?
     allow do
-      origins ENV['FRONTEND_URL'] || 'https://your-app.com'
-      
-      resource '*',
+      origins ENV["FRONTEND_URL"] || "https://your-app.com"
+
+      resource "*",
         headers: :any,
-        methods: [:get, :post, :put, :patch, :delete, :options, :head],
+        methods: [ :get, :post, :put, :patch, :delete, :options, :head ],
         credentials: true,
-        expose: ['Authorization']
+        expose: [ "Authorization" ]
     end
   end
 end

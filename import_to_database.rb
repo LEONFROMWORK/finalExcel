@@ -4,15 +4,15 @@
 # Helper method to calculate quality score
 def calculate_quality_score(item)
   score = 0.5 # Base score
-  
+
   # Add points for various quality indicators
   score += 0.1 if item[:answer].length > 100
   score += 0.1 if item[:images].present? && item[:images].any?
   score += 0.1 if item[:tags].present? && item[:tags].any?
   score += 0.1 if item.dig(:metadata, :answer_score).to_i > 0
   score += 0.1 if item[:answer].include?('[이미지 설명]')
-  
-  [score, 1.0].min
+
+  [ score, 1.0 ].min
 end
 
 puts "📥 Importing collected data to database..."
@@ -23,23 +23,23 @@ export_dir = Rails.root.join('tmp', 'platform_datasets')
 date_str = Date.current.strftime('%Y%m%d')
 
 # Import data from each platform
-platforms = ['stackoverflow', 'reddit', 'mrexcel', 'oppadu']
+platforms = [ 'stackoverflow', 'reddit', 'mrexcel', 'oppadu' ]
 total_imported = 0
 
 platforms.each do |platform|
   filename = "#{platform}_dataset_#{date_str}.json"
   filepath = export_dir.join(filename)
-  
+
   if File.exist?(filepath)
     puts "\n📄 Processing #{platform}..."
-    
+
     # Load JSON data
     data = JSON.parse(File.read(filepath), symbolize_names: true)
     items = data[:items] || []
-    
+
     imported = 0
     skipped = 0
-    
+
     items.each do |item|
       begin
         # Check if already exists
@@ -47,12 +47,12 @@ platforms.each do |platform|
           question: item[:question],
           source: platform
         )
-        
+
         if existing
           skipped += 1
           next
         end
-        
+
         # Create new QA pair
         qa_pair = KnowledgeBase::QaPair.create!(
           question: item[:question],
@@ -69,15 +69,15 @@ platforms.each do |platform|
           quality_score: calculate_quality_score(item),
           approved: true # Auto-approve collected data
         )
-        
+
         imported += 1
-        
+
       rescue => e
         puts "  ❌ Error importing item: #{e.message}"
         puts "     Title: #{item[:title]}"
       end
     end
-    
+
     puts "  ✅ Imported: #{imported}, Skipped: #{skipped}"
     total_imported += imported
   else

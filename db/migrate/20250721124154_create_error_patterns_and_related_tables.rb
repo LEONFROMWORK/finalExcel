@@ -17,10 +17,10 @@ class CreateErrorPatternsAndRelatedTables < ActiveRecord::Migration[8.0]
       t.datetime :approved_at
       t.text :tags, array: true, default: []
       t.jsonb :metadata, default: {}
-      
+
       t.timestamps
     end
-    
+
     # 사용 추적 테이블
     create_table :error_pattern_usages do |t|
       t.references :error_pattern, null: false, foreign_key: true
@@ -29,10 +29,10 @@ class CreateErrorPatternsAndRelatedTables < ActiveRecord::Migration[8.0]
       t.integer :feedback # 1-5 rating
       t.boolean :resolved
       t.datetime :used_at
-      
+
       t.timestamps
     end
-    
+
     # 검증 결과 테이블
     create_table :pattern_validations do |t|
       t.references :error_pattern, null: false, foreign_key: true
@@ -40,10 +40,10 @@ class CreateErrorPatternsAndRelatedTables < ActiveRecord::Migration[8.0]
       t.float :score
       t.jsonb :issues, default: {}
       t.string :validated_by, limit: 50 # 'system' or user_id
-      
+
       t.timestamps
     end
-    
+
     # 인덱스 추가
     add_index :error_patterns, :error_type
     add_index :error_patterns, :category
@@ -54,10 +54,10 @@ class CreateErrorPatternsAndRelatedTables < ActiveRecord::Migration[8.0]
     add_index :error_patterns, :effectiveness_score
     add_index :error_patterns, :tags, using: :gin
     add_index :error_patterns, :metadata, using: :gin
-    
-    add_index :error_pattern_usages, [:error_pattern_id, :user_id]
+
+    add_index :error_pattern_usages, [ :error_pattern_id, :user_id ]
     add_index :error_pattern_usages, :used_at
-    
-    add_index :pattern_validations, [:error_pattern_id, :validation_type]
+
+    add_index :pattern_validations, [ :error_pattern_id, :validation_type ]
   end
 end

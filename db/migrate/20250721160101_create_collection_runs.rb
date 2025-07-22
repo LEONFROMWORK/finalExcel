@@ -10,11 +10,11 @@ class CreateCollectionRuns < ActiveRecord::Migration[8.0]
       t.integer :duration
       t.text :error_message
       t.jsonb :metadata, default: {}
-      
+
       t.timestamps
     end
-    
+
     add_index :collection_runs, :status
-    add_index :collection_runs, [:collection_task_id, :created_at]
+    add_index :collection_runs, [ :collection_task_id, :created_at ]
   end
 end

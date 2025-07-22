@@ -3,8 +3,8 @@
 module DataPipeline
   class CollectionTask < ApplicationRecord
     # Associations
-    belongs_to :created_by, class_name: "Authentication::User"
-    belongs_to :user, class_name: "Authentication::User", optional: true
+    belongs_to :created_by, class_name: "User"
+    belongs_to :user, optional: true
     has_many :collection_runs, dependent: :destroy
 
     # Validations
@@ -69,7 +69,7 @@ module DataPipeline
 
       # Update next run time
       update_next_run_at!
-      
+
       run
     end
 

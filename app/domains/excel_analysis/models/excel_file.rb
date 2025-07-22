@@ -2,8 +2,8 @@ module ExcelAnalysis
   class ExcelFile < ApplicationRecord
     belongs_to :user
     has_many :analysis_results, dependent: :destroy
-    has_many :chat_sessions, class_name: 'AiConsultation::ChatSession', dependent: :nullify
-    
+    has_many :chat_sessions, class_name: "AiConsultation::ChatSession", dependent: :nullify
+
     has_one_attached :original_file
     has_one_attached :processed_file
     has_many_attached :additional_files # For screenshots, etc.
@@ -20,14 +20,14 @@ module ExcelAnalysis
     validates :original_file, presence: true
 
     # Analysis metadata stored in jsonb
-    store_accessor :metadata, :sheet_count, :error_count, :formula_count, 
+    store_accessor :metadata, :sheet_count, :error_count, :formula_count,
                    :has_vba, :vba_modules, :data_issues, :formula_errors,
                    :enhancement_suggestions, :file_structure
 
     before_save :extract_file_info, if: :original_file_changed?
 
     scope :recent, -> { order(created_at: :desc) }
-    scope :with_errors, -> { where('error_count > 0') }
+    scope :with_errors, -> { where("error_count > 0") }
     scope :with_vba, -> { where(has_vba: true) }
 
     def analyze!
@@ -62,7 +62,7 @@ module ExcelAnalysis
 
     def extract_file_info
       return unless original_file.attached?
-      
+
       self.name = original_file.filename.to_s if name.blank?
       self.content_type = original_file.content_type
     end

@@ -44,7 +44,7 @@ class ImageQualityAssessor
   # @param ocr_result [Hash] OCR extraction results
   # @return [Hash] Assessment with quality score and recommendations
   def assess_ocr_quality(ocr_result)
-    return failed_assessment('No OCR result') if ocr_result.nil?
+    return failed_assessment("No OCR result") if ocr_result.nil?
 
     text_length = ocr_result[:text_length] || 0
     word_count = ocr_result[:word_count] || 0
@@ -52,7 +52,7 @@ class ImageQualityAssessor
 
     # Calculate composite quality score
     quality_score = calculate_ocr_quality_score(text_length, word_count, confidence)
-    
+
     assessment = {
       quality_score: quality_score,
       confidence_level: determine_confidence_level(quality_score),
@@ -81,19 +81,19 @@ class ImageQualityAssessor
   # @param table_result [Hash] Table detection results
   # @return [Hash] Assessment with quality metrics
   def assess_table_quality(table_result)
-    return failed_assessment('No table result') if table_result.nil?
+    return failed_assessment("No table result") if table_result.nil?
 
     tables_found = table_result[:tables_found] || 0
     has_content = table_result[:markdown_content].present?
-    
+
     # Simple table quality score
     quality_score = if tables_found > 0 && has_content
                      0.9
-                   elsif tables_found > 0
+    elsif tables_found > 0
                      0.6
-                   else
+    else
                      0.0
-                   end
+    end
 
     {
       quality_score: quality_score,
@@ -118,10 +118,10 @@ class ImageQualityAssessor
 
     # Check for complex content indicators
     complex_content_indicators = [
-      'chart', 'graph', 'diagram', 'plot', 'visualization',
-      'formula', 'equation', 'complex', 'pivot'
+      "chart", "graph", "diagram", "plot", "visualization",
+      "formula", "equation", "complex", "pivot"
     ]
-    
+
     has_complex_content = context_tags.any? do |tag|
       complex_content_indicators.any? { |indicator| tag.downcase.include?(indicator) }
     end
@@ -146,9 +146,9 @@ class ImageQualityAssessor
   # @param processing_result [Hash] Complete processing result from any tier
   # @return [Hash] Final quality assessment
   def assess_final_quality(processing_result)
-    return failed_assessment('No processing result') if processing_result.nil?
+    return failed_assessment("No processing result") if processing_result.nil?
 
-    content = processing_result[:extracted_content] || ''
+    content = processing_result[:extracted_content] || ""
     content_type = processing_result[:extracted_content_type]
     processing_tier = processing_result[:processing_tier]
 
@@ -174,8 +174,8 @@ class ImageQualityAssessor
 
   def calculate_ocr_quality_score(text_length, word_count, confidence)
     # Weighted scoring based on multiple factors
-    length_score = [text_length.to_f / 100, 1.0].min * 0.3
-    word_score = [word_count.to_f / 20, 1.0].min * 0.3
+    length_score = [ text_length.to_f / 100, 1.0 ].min * 0.3
+    word_score = [ word_count.to_f / 20, 1.0 ].min * 0.3
     confidence_score = confidence * 0.4
 
     length_score + word_score + confidence_score
@@ -183,25 +183,25 @@ class ImageQualityAssessor
 
   def calculate_final_quality_score(content, content_type, processing_tier)
     base_score = case processing_tier
-                 when /Tier 3/i then 0.9  # AI processing is highly reliable
-                 when /Tier 2/i then 0.7  # Table detection is good
-                 when /Tier 1/i then 0.5  # Basic OCR
-                 else 0.3                 # Fallback/placeholder
-                 end
+    when /Tier 3/i then 0.9  # AI processing is highly reliable
+    when /Tier 2/i then 0.7  # Table detection is good
+    when /Tier 1/i then 0.5  # Basic OCR
+    else 0.3                 # Fallback/placeholder
+    end
 
     # Adjust based on content quality
     content_multiplier = case content_type
-                        when 'markdown_table' then 1.1
-                        when 'chart_description' then 1.2
-                        when 'enhanced_text' then 1.15
-                        when 'plain_text' then 1.0
-                        else 0.8
-                        end
+    when "markdown_table" then 1.1
+    when "chart_description" then 1.2
+    when "enhanced_text" then 1.15
+    when "plain_text" then 1.0
+    else 0.8
+    end
 
     # Penalize very short content
     length_penalty = content.length < 20 ? 0.8 : 1.0
 
-    [base_score * content_multiplier * length_penalty, 1.0].min
+    [ base_score * content_multiplier * length_penalty, 1.0 ].min
   end
 
   def determine_confidence_level(score)
@@ -215,19 +215,19 @@ class ImageQualityAssessor
 
   def generate_ocr_recommendations(ocr_result)
     recommendations = []
-    
+
     if ocr_result[:text_length] < QUALITY_THRESHOLDS[:min_text_length]
       recommendations << "Text too short, try image preprocessing"
     end
-    
+
     if ocr_result[:word_count] < QUALITY_THRESHOLDS[:min_word_count]
       recommendations << "Few words detected, check image quality"
     end
-    
+
     if ocr_result[:confidence] < CONFIDENCE_THRESHOLDS[:low]
       recommendations << "Low OCR confidence, use AI enhancement"
     end
-    
+
     recommendations
   end
 

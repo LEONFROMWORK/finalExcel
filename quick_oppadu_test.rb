@@ -18,17 +18,17 @@ result = collector.collect_data(3)
 
 if result[:success]
   puts "✅ 수집 성공: #{result[:results].size}개"
-  
+
   # Show all results
   result[:results].each_with_index do |item, idx|
     puts "\n#{idx + 1}. #{item[:title]}"
     puts "   질문 길이: #{item[:question]&.length || 0}"
     puts "   답변 길이: #{item[:answer]&.length || 0}"
     puts "   이미지: #{item[:images]&.size || 0}개"
-    
+
     if item[:images]&.any?
       puts "   이미지 URL: #{item[:images].first[:url]}"
-      
+
       # Check answer content
       if item[:answer].include?("AI Vision Processing")
         puts "   ✅ AI 처리 완료"
@@ -40,7 +40,7 @@ if result[:success]
       end
     end
   end
-  
+
   # Check save status
   if result[:save_status]
     puts "\n💾 저장됨: oppadu_dataset_#{Date.current.strftime('%Y%m%d')}.json"

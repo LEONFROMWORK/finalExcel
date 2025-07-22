@@ -12,13 +12,13 @@ class CreateNotifications < ActiveRecord::Migration[8.0]
       t.string :action_text
       t.string :priority, default: 'normal'
       t.datetime :expires_at
-      
+
       t.timestamps
     end
-    
+
     # 인덱스 추가
-    add_index :notifications, [:user_id, :read]
-    add_index :notifications, [:user_id, :created_at]
+    add_index :notifications, [ :user_id, :read ]
+    add_index :notifications, [ :user_id, :created_at ]
     add_index :notifications, :type
     add_index :notifications, :priority
     add_index :notifications, :expires_at

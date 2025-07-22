@@ -6,21 +6,21 @@ module Api
     class VbaHelperController < Api::V1::ApiController
       # FREE TEST PERIOD - Authentication is already disabled in ApiController
       # skip_before_action :authenticate_user!, only: [:solve, :common_patterns]
-      
+
       # POST /api/v1/vba/solve
       # VBA 오류에 대한 해결책 제공
       def solve
         helper = PracticalVbaHelper.new
         result = helper.solve(params[:error_description])
-        
+
         # 신뢰도가 낮고 사용자가 로그인했으며 크레딧이 있으면 AI 보조
         if result[:need_ai_help] && current_user&.has_credits?
           result[:ai_suggestion] = get_ai_assistance(params[:error_description])
         end
-        
+
         # 사용 기록 (백그라운드)
         track_usage(result) if result[:success]
-        
+
         render json: {
           success: true,
           data: result,
@@ -34,7 +34,7 @@ module Api
           timestamp: Time.current
         }, status: :internal_server_error
       end
-      
+
       # POST /api/v1/vba/feedback
       # 해결책이 도움이 되었는지 피드백 수집
       def feedback
@@ -49,7 +49,7 @@ module Api
             feedback_text: params[:feedback_text]
           }
         )
-        
+
         render json: {
           success: true,
           message: params[:was_helpful] ? "감사합니다! 피드백이 기록되었습니다." : "더 나은 해결책을 찾아보겠습니다.",
@@ -62,13 +62,13 @@ module Api
           error: "피드백 저장 중 오류가 발생했습니다"
         }, status: :unprocessable_entity
       end
-      
+
       # GET /api/v1/vba/common_patterns
       # 자주 발생하는 오류 패턴 목록
       def common_patterns
         helper = PracticalVbaHelper.new
         patterns = helper.get_common_patterns
-        
+
         # 캐시에서 성공률 추가
         patterns_with_stats = patterns.map do |pattern|
           pattern.merge(
@@ -76,47 +76,47 @@ module Api
             usage_count: VbaUsagePattern.by_pattern(pattern[:key]).count
           )
         end
-        
+
         render json: {
           success: true,
           patterns: patterns_with_stats,
           total_count: patterns.size
         }
       end
-      
+
       # GET /api/v1/vba/stats
       # VBA 도우미 사용 통계 (인증 필요)
       def stats
         authorize_admin!
-        
+
         stats = VbaUsagePattern.usage_stats
-        
+
         render json: {
           success: true,
           stats: stats,
           generated_at: Time.current
         }
       end
-      
+
       private
-      
+
       def get_ai_assistance(error_description)
         return nil unless current_user.credits > 0
-        
+
         begin
           ai_service = UnifiedAiService.new(:basic)
-          
+
           prompt = <<~PROMPT
             VBA 오류를 간단히 해결해주세요 (한 문장):
             오류: #{error_description}
           PROMPT
-          
+
           response = ai_service.generate_text(
             prompt: prompt,
             max_tokens: 100,
             temperature: 0.3
           )
-          
+
           if response[:success]
             # 크레딧 차감
             current_user.decrement!(:credits, 0.01)
@@ -129,7 +129,7 @@ module Api
           nil
         end
       end
-      
+
       def track_usage(result)
         # 비동기로 사용 기록
         VbaUsageTrackingJob.perform_later(
@@ -140,7 +140,7 @@ module Api
           user_id: current_user&.id
         ) if result[:error_type].present?
       end
-      
+
       def authorize_admin!
         unless current_user&.admin?
           render json: { error: "관리자 권한이 필요합니다" }, status: :forbidden

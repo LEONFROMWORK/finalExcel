@@ -17,9 +17,9 @@ class CreateVectorDbStatuses < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    
+
     # 인덱스 추가
-    add_index :vector_db_statuses, [:source_type, :source_id], unique: true
+    add_index :vector_db_statuses, [ :source_type, :source_id ], unique: true
     add_index :vector_db_statuses, :status
     add_index :vector_db_statuses, :started_at
     add_index :vector_db_statuses, :created_at

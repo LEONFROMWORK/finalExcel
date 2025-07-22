@@ -12,11 +12,11 @@ class CreateVbaUsagePatterns < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    
+
     # 인덱스 추가
     add_index :vba_usage_patterns, :error_pattern
     add_index :vba_usage_patterns, :was_helpful
-    add_index :vba_usage_patterns, [:error_pattern, :was_helpful]
+    add_index :vba_usage_patterns, [ :error_pattern, :was_helpful ]
     add_index :vba_usage_patterns, :created_at
   end
 end

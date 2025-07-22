@@ -2,28 +2,28 @@
 
 namespace :platform_collector do
   desc "Collect data from Stack Overflow, Reddit, or Oppadu"
-  task :collect, [:platform, :limit] => :environment do |t, args|
+  task :collect, [ :platform, :limit ] => :environment do |t, args|
     platform = args[:platform]
     limit = (args[:limit] || 10).to_i
-    
+
     unless platform
       puts "❌ Platform을 지정하세요"
       puts "사용법: rails platform_collector:collect[stackoverflow,10]"
       puts "지원 플랫폼: stackoverflow, reddit, oppadu"
       exit
     end
-    
+
     puts "=== #{platform.capitalize} 데이터 수집 ==="
     puts "수집 개수: #{limit}"
-    
+
     collector = PlatformDataCollector.new(platform)
     result = collector.collect_data(limit)
-    
+
     if result[:success]
       puts "✅ 성공!"
       puts "메시지: #{result[:message]}" if result[:message]
       puts "수집된 항목: #{result[:results].size}" if result[:results]
-      
+
       # 저장 상태 표시
       if result[:save_status]
         save_status = result[:save_status]
@@ -42,20 +42,20 @@ namespace :platform_collector do
       puts "오류: #{result[:error]}"
     end
   end
-  
+
   desc "Test all platforms"
   task test_all: :environment do
     platforms = %w[stackoverflow reddit oppadu]
-    
+
     puts "=== 모든 플랫폼 테스트 ==="
-    
+
     platforms.each do |platform|
       puts "\n--- #{platform.capitalize} ---"
-      
+
       begin
         collector = PlatformDataCollector.new(platform)
         result = collector.collect_data(5) # 테스트용으로 5개만
-        
+
         if result[:success]
           puts "✅ 성공: #{result[:message] || '데이터 수집 완료'}"
         else
@@ -66,14 +66,14 @@ namespace :platform_collector do
       end
     end
   end
-  
+
   desc "Generate daily summary"
   task daily_summary: :environment do
     puts "=== 일일 데이터 수집 요약 ==="
-    
+
     saver = PlatformDataSaver.new
     summary = saver.generate_daily_summary
-    
+
     puts "\n📅 날짜: #{summary[:date]}"
     puts "\n📊 전체 통계:"
     puts "  - 총 항목 수: #{summary[:totals][:items]}"
@@ -81,11 +81,11 @@ namespace :platform_collector do
     puts "  - VBA 코드: #{summary[:totals][:with_vba]}"
     puts "  - 테이블: #{summary[:totals][:with_tables]}"
     puts "  - 수식: #{summary[:totals][:with_formulas]}"
-    
+
     puts "\n📈 플랫폼별 상세:"
     summary[:platforms].each do |platform, stats|
       puts "\n#{platform.capitalize}:"
-      if stats[:status] == 'no_data_today'
+      if stats[:status] == "no_data_today"
         puts "  ❌ 오늘 수집된 데이터 없음"
       else
         puts "  - 전체 항목: #{stats[:total_items]}"
@@ -95,42 +95,42 @@ namespace :platform_collector do
       end
     end
   end
-  
+
   desc "Check API configuration"
   task check_config: :environment do
     puts "=== API 설정 확인 ==="
-    
+
     # Stack Overflow
-    so_key = ENV['STACKOVERFLOW_API_KEY']
+    so_key = ENV["STACKOVERFLOW_API_KEY"]
     puts "\nStack Overflow:"
     puts "  API Key: #{so_key.present? ? '✅ 설정됨' : '❌ 없음'}"
-    
+
     # Reddit
-    reddit_id = ENV['REDDIT_CLIENT_ID']
-    reddit_secret = ENV['REDDIT_CLIENT_SECRET']
+    reddit_id = ENV["REDDIT_CLIENT_ID"]
+    reddit_secret = ENV["REDDIT_CLIENT_SECRET"]
     puts "\nReddit:"
     puts "  Client ID: #{reddit_id.present? ? '✅ 설정됨' : '❌ 없음'}"
     puts "  Client Secret: #{reddit_secret.present? ? '✅ 설정됨' : '❌ 없음'}"
-    
+
     # Oppadu
     puts "\n오빠두 (Oppadu):"
     puts "  API 불필요 (웹 스크래핑 사용 예정)"
-    
+
     # Pipedata
-    pipedata_path = ENV['PIPEDATA_PATH'] || '/Users/kevin/pipedata'
-    db_exists = File.exist?(File.join(pipedata_path, 'data', 'stackoverflow_analysis.db'))
+    pipedata_path = ENV["PIPEDATA_PATH"] || "/Users/kevin/pipedata"
+    db_exists = File.exist?(File.join(pipedata_path, "data", "stackoverflow_analysis.db"))
     puts "\nPipedata (StackOverflow 대체):"
     puts "  Path: #{pipedata_path}"
     puts "  Database: #{db_exists ? '✅ 존재' : '❌ 없음'}"
   end
-  
+
   desc "Import from Pipedata (StackOverflow local data)"
   task import_pipedata: :environment do
     puts "=== Pipedata에서 StackOverflow 데이터 가져오기 ==="
-    
+
     importer = PipedataImporter.new
     result = importer.import_excel_qa
-    
+
     if result[:success]
       puts "✅ 성공!"
       puts "가져온 항목: #{result[:imported]}"
@@ -141,16 +141,16 @@ namespace :platform_collector do
       puts "오류: #{result[:error]}"
     end
   end
-  
+
   desc "Create collection tasks for platforms"
   task create_tasks: :environment do
-    user = Authentication::User.find_by(email: 'admin@excel-unified.com')
-    
+    user = Authentication::User.find_by(email: "admin@excel-unified.com")
+
     unless user
       puts "❌ Admin 사용자를 찾을 수 없습니다"
       exit
     end
-    
+
     # Stack Overflow task
     task1 = DataPipeline::CollectionTask.find_or_create_by(name: "Stack Overflow Excel Q&A") do |t|
       t.task_type = :web_scraping
@@ -158,13 +158,13 @@ namespace :platform_collector do
       t.status = :active
       t.source_config = {
         "platform" => "stackoverflow",
-        "tags" => ["excel", "excel-formula", "excel-vba"],
+        "tags" => [ "excel", "excel-formula", "excel-vba" ],
         "output" => { "type" => "knowledge_base" },
         "max_items_per_run" => 50
       }
       t.created_by = user
     end
-    
+
     # Reddit task
     task2 = DataPipeline::CollectionTask.find_or_create_by(name: "Reddit r/excel Q&A") do |t|
       t.task_type = :api_fetch
@@ -178,7 +178,7 @@ namespace :platform_collector do
       }
       t.created_by = user
     end
-    
+
     # Oppadu task
     task3 = DataPipeline::CollectionTask.find_or_create_by(name: "오빠두 Excel 강좌") do |t|
       t.task_type = :web_scraping
@@ -192,7 +192,7 @@ namespace :platform_collector do
       }
       t.created_by = user
     end
-    
+
     puts "✅ Collection tasks 생성 완료:"
     puts "1. #{task1.name} (ID: #{task1.id}) - Status: #{task1.status}"
     puts "2. #{task2.name} (ID: #{task2.id}) - Status: #{task2.status}"

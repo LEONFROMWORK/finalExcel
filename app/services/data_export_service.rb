@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-require 'json'
-require 'fileutils'
+require "json"
+require "fileutils"
 
 class DataExportService
-  EXPORT_DIR = Rails.root.join('tmp', 'exports')
+  EXPORT_DIR = Rails.root.join("tmp", "exports")
 
   def initialize
     FileUtils.mkdir_p(EXPORT_DIR)
   end
 
   def export_for_rag(qa_pairs)
-    timestamp = Time.current.strftime('%Y%m%d_%H%M%S')
+    timestamp = Time.current.strftime("%Y%m%d_%H%M%S")
     filename = "rag_export_#{timestamp}.json"
     filepath = EXPORT_DIR.join(filename)
 
@@ -47,7 +47,7 @@ class DataExportService
   end
 
   def export_to_json(qa_pairs, include_embeddings: false)
-    timestamp = Time.current.strftime('%Y%m%d_%H%M%S')
+    timestamp = Time.current.strftime("%Y%m%d_%H%M%S")
     filename = "qa_export_#{timestamp}.json"
     filepath = EXPORT_DIR.join(filename)
 
@@ -87,8 +87,8 @@ class DataExportService
       tags: qa.tags,
       quality_score: qa.quality_score,
       metadata: {
-        has_images: qa.metadata&.dig('has_images') || false,
-        image_count: qa.metadata&.dig('images')&.size || 0,
+        has_images: qa.metadata&.dig("has_images") || false,
+        image_count: qa.metadata&.dig("images")&.size || 0,
         created_at: qa.created_at.iso8601,
         approved: qa.is_approved
       },
@@ -115,12 +115,12 @@ class DataExportService
   end
 
   def python_service_available?
-    return false unless ENV['PYTHON_SERVICE_URL'].present?
+    return false unless ENV["PYTHON_SERVICE_URL"].present?
 
     begin
       uri = URI("#{ENV['PYTHON_SERVICE_URL']}/health")
       response = Net::HTTP.get_response(uri)
-      response.code == '200'
+      response.code == "200"
     rescue
       false
     end
@@ -128,12 +128,12 @@ class DataExportService
 
   def send_to_python_service(data)
     uri = URI("#{ENV['PYTHON_SERVICE_URL']}/api/v1/knowledge_base/import")
-    
+
     request = Net::HTTP::Post.new(uri)
-    request['Content-Type'] = 'application/json'
+    request["Content-Type"] = "application/json"
     request.body = data.to_json
 
-    Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
+    Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == "https") do |http|
       response = http.request(request)
       Rails.logger.info "Sent to Python service: #{response.code}"
     end

@@ -14,7 +14,7 @@ puts "✅ Cache cleared"
 date_str = Date.current.strftime('%Y%m%d')
 export_dir = Rails.root.join('tmp', 'platform_datasets')
 
-['stackoverflow', 'reddit', 'mrexcel', 'oppadu'].each do |platform|
+[ 'stackoverflow', 'reddit', 'mrexcel', 'oppadu' ].each do |platform|
   filename = "#{platform}_dataset_#{date_str}.json"
   filepath = export_dir.join(filename)
   if File.exist?(filepath)
@@ -44,15 +44,15 @@ summary = {
 collections.each do |config|
   puts "\n" + "=" * 60
   puts "🌐 Collecting #{config[:limit]} items from #{config[:platform].capitalize}..."
-  
+
   start_time = Time.now
   collector = PlatformDataCollector.new(config[:platform])
   result = collector.collect_data(config[:limit])
   elapsed = (Time.now - start_time).round(2)
-  
+
   if result[:success]
     puts "✅ Collected #{result[:results].size} items in #{elapsed}s"
-    
+
     # Analyze image processing results
     platform_stats = {
       collected: result[:results].size,
@@ -60,15 +60,15 @@ collections.each do |config|
       successful_analyses: 0,
       failed_analyses: 0
     }
-    
+
     result[:results].each do |item|
       if item[:images]&.any?
         platform_stats[:with_images] += 1
-        
+
         # Check answer for image processing results
         if item[:answer].include?('[이미지 설명]')
           descriptions = item[:answer].scan(/이미지 \d+ \([^)]+\): (.+?)(?=\n이미지 \d+|$)/m)
-          
+
           descriptions.each do |(desc)|
             if desc.include?("I'm unable to analyze") || desc.include?("unable to access")
               platform_stats[:failed_analyses] += 1
@@ -79,17 +79,17 @@ collections.each do |config|
         end
       end
     end
-    
+
     summary[:platforms][config[:platform]] = platform_stats
     summary[:total_collected] += platform_stats[:collected]
     summary[:total_with_images] += platform_stats[:with_images]
     summary[:successful_image_analyses] += platform_stats[:successful_analyses]
     summary[:failed_image_analyses] += platform_stats[:failed_analyses]
-    
+
     puts "📸 Items with images: #{platform_stats[:with_images]}"
     puts "✅ Successful image analyses: #{platform_stats[:successful_analyses]}"
     puts "❌ Failed image analyses: #{platform_stats[:failed_analyses]}"
-    
+
     if result[:save_status]
       puts "📁 Saved to: #{File.basename(result[:save_status][:filepath])}"
     end
@@ -97,7 +97,7 @@ collections.each do |config|
     puts "❌ Failed: #{result[:error]}"
     summary[:platforms][config[:platform]] = { error: result[:error] }
   end
-  
+
   # Brief pause between platforms
   sleep(2)
 end
@@ -112,7 +112,7 @@ puts "Successful image analyses: #{summary[:successful_image_analyses]}"
 puts "Failed image analyses: #{summary[:failed_image_analyses]}"
 
 if summary[:total_with_images] > 0
-  success_rate = (summary[:successful_image_analyses].to_f / 
+  success_rate = (summary[:successful_image_analyses].to_f /
                   (summary[:successful_image_analyses] + summary[:failed_image_analyses]) * 100).round(1)
   puts "Image analysis success rate: #{success_rate}%"
 end

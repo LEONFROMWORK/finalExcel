@@ -34,7 +34,7 @@ if with_images.any?
   puts "\n  Examples of processed images:"
   with_images.limit(3).each_with_index do |qa, idx|
     puts "\n  #{idx + 1}. [#{qa.source}] #{qa.question[0..60]}..."
-    
+
     # Extract image description
     if qa.answer.match(/\[이미지 설명\]\n(.+?)(\n\n|$)/m)
       desc = $1

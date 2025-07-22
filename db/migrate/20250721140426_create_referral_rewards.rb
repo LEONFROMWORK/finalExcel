@@ -13,16 +13,16 @@ class CreateReferralRewards < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    
+
     # 외래키 추가
     add_foreign_key :referral_rewards, :users, column: :referrer_id
     add_foreign_key :referral_rewards, :users, column: :referred_id
-    
+
     # 인덱스 추가
     add_index :referral_rewards, :referrer_id
     add_index :referral_rewards, :referred_id
     add_index :referral_rewards, :status
-    add_index :referral_rewards, [:referrer_id, :status]
-    add_index :referral_rewards, [:referred_id, :referral_code_id], unique: true
+    add_index :referral_rewards, [ :referrer_id, :status ]
+    add_index :referral_rewards, [ :referred_id, :referral_code_id ], unique: true
   end
 end
