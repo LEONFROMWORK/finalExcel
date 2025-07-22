@@ -3,7 +3,7 @@
 module Api
   module V1
     module Admin
-      class DataCollectionController < ApiController
+      class DataCollectionController < Api::V1::ApiController
         # FREE TEST PERIOD - No authentication required
         # before_action :authenticate_admin!
 

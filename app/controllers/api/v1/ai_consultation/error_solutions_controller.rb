@@ -3,8 +3,9 @@
 module Api
   module V1
     module AiConsultation
-      class ErrorSolutionsController < ApplicationController
-        before_action :authenticate_user!
+      class ErrorSolutionsController < Api::V1::ApiController
+        # FREE TEST PERIOD - Authentication disabled
+        # before_action :authenticate_user!
         before_action :set_excel_file
         
         # POST /api/v1/ai_consultation/error_solutions/analyze

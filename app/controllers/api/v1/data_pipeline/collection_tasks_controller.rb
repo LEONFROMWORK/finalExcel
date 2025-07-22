@@ -3,9 +3,10 @@
 module Api
   module V1
     module DataPipeline
-      class CollectionTasksController < Api::V1::BaseController
-        before_action :authenticate_user!
-        before_action :require_admin!
+      class CollectionTasksController < Api::V1::ApiController
+        # FREE TEST PERIOD - Authentication disabled
+        # before_action :authenticate_user!
+        # before_action :require_admin!
         before_action :set_collection_task, only: [ :show, :update, :destroy, :start, :stop, :runs, :statistics ]
 
         def index
@@ -142,11 +143,7 @@ module Api
           @collection_repository ||= ::DataPipeline::Repositories::CollectionRepository.new
         end
 
-        def require_admin!
-          unless current_user.admin?
-            render_error([ "Admin access required" ], :forbidden)
-          end
-        end
+        # require_admin! is already defined in ApiController
       end
     end
   end

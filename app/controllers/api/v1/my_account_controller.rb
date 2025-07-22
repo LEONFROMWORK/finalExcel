@@ -3,8 +3,9 @@
 module Api
   module V1
     # 나의 페이지 API 컨트롤러
-    class MyAccountController < ApplicationController
-      before_action :authenticate_user!
+    class MyAccountController < Api::V1::ApiController
+      # FREE TEST PERIOD - Authentication disabled
+      # before_action :authenticate_user!
       
       # 추천 통계 및 정보
       def referral_stats

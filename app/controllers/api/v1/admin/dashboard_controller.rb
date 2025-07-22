@@ -4,7 +4,7 @@ module Api
   module V1
     module Admin
       # 관리자 대시보드 API
-      class DashboardController < ApiController
+      class DashboardController < Api::V1::ApiController
         # FREE TEST PERIOD - No authentication required
         # before_action :authenticate_admin!
         

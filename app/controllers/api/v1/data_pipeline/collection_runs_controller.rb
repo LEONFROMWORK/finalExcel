@@ -3,9 +3,10 @@
 module Api
   module V1
     module DataPipeline
-      class CollectionRunsController < Api::V1::BaseController
-        before_action :authenticate_user!
-        before_action :require_admin!
+      class CollectionRunsController < Api::V1::ApiController
+        # FREE TEST PERIOD - Authentication disabled
+        # before_action :authenticate_user!
+        # before_action :require_admin!
         before_action :set_collection_run, only: [ :show, :cancel ]
 
         def show
@@ -34,11 +35,7 @@ module Api
           render_error([ "Collection run not found" ], :not_found)
         end
 
-        def require_admin!
-          unless current_user.admin?
-            render_error([ "Admin access required" ], :forbidden)
-          end
-        end
+        # require_admin! is already defined in ApiController
       end
     end
   end

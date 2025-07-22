@@ -3,8 +3,9 @@
 module Api
   module V1
     # 알림 API 컨트롤러
-    class NotificationsController < ApplicationController
-      before_action :authenticate_user!
+    class NotificationsController < Api::V1::ApiController
+      # FREE TEST PERIOD - Authentication disabled
+      # before_action :authenticate_user!
       before_action :set_notification_service
       
       # 알림 목록 조회
