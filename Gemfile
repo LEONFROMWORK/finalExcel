@@ -26,7 +26,7 @@ gem "rack-cors"
 
 # HTTP requests
 gem "httparty"
-gem "nokogiri", "~> 1.16", force_ruby_platform: true
+gem "nokogiri", "~> 1.18", force_ruby_platform: true
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
