@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: excel-unified
+    runtime: ruby
+    buildCommand: ./bin/render-build.sh
+    startCommand: bundle exec rails server
+    envVars:
+      - key: DATABASE_URL
+        sync: false  # Railway DB URL 수동 입력
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: RAILS_ENV
+        value: production
+      - key: RAILS_SERVE_STATIC_FILES
+        value: true
+      - key: RAILS_LOG_TO_STDOUT
+        value: true
