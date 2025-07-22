@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["ruby_3_3", "postgresql", "libxml2", "libxslt", "pkg-config"]
+nixPkgs = ["ruby_3_3", "postgresql", "libxml2", "libxslt", "pkg-config", "nodejs"]
 
 [phases.install]
 dependsOn = ["setup"]
@@ -7,7 +7,15 @@ cmds = [
   "gem install bundler:2.7.0",
   "bundle config set --local deployment false",
   "bundle config set --local frozen false",
-  "bundle install --jobs 4 --retry 3"
+  "bundle install --jobs 4 --retry 3",
+  "npm install"
+]
+
+[phases.build]
+dependsOn = ["install"]
+cmds = [
+  "npm run build || true",
+  "RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile || true"
 ]
 
 [start]

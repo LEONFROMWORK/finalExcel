@@ -19,7 +19,7 @@ npm run build || echo "⚠️  Vite build skipped"
 
 # Precompile assets
 echo "🎨 Precompiling assets..."
-bundle exec rails assets:precompile
+RAILS_ENV=production bundle exec rails assets:precompile || echo "⚠️  Assets precompilation failed, continuing..."
 
 # Clean up old assets
 echo "🧹 Cleaning old assets..."

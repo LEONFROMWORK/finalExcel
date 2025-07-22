@@ -114,9 +114,5 @@ Rails.application.configure do
   # Enable static file serving for Railway
   config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present? || ENV["RAILWAY_ENVIRONMENT"].present?
 
-  # Vite configuration for production
-  if defined?(ViteRails)
-    config.vite.mode = "production"
-    config.vite.cache_manifest = true
-  end
+  # Vite configuration is handled by vite_rails gem automatically
 end
