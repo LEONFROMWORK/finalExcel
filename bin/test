@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# Test runner script
+
+set -e
+
+echo "🧪 Running Excel Unified Test Suite"
+echo "=================================="
+
+# Function to run tests with timing
+run_with_timing() {
+    local name=$1
+    local command=$2
+    
+    echo ""
+    echo "🏃 Running $name..."
+    start_time=$(date +%s)
+    
+    if eval "$command"; then
+        end_time=$(date +%s)
+        duration=$((end_time - start_time))
+        echo "✅ $name completed in ${duration}s"
+    else
+        echo "❌ $name failed!"
+        exit 1
+    fi
+}
+
+# Parse arguments
+SUITE=${1:-all}
+COVERAGE=${COVERAGE:-false}
+
+case $SUITE in
+    unit)
+        echo "Running unit tests only..."
+        run_with_timing "Ruby unit tests" "bundle exec rspec spec/models spec/services spec/repositories"
+        run_with_timing "JavaScript unit tests" "npm test -- --run"
+        ;;
+    
+    integration)
+        echo "Running integration tests only..."
+        run_with_timing "API integration tests" "bundle exec rspec spec/requests"
+        ;;
+    
+    e2e)
+        echo "Running E2E tests only..."
+        echo "Starting test server..."
+        RAILS_ENV=test bin/rails server -p 3001 -d
+        sleep 5
+        run_with_timing "Cypress E2E tests" "npx cypress run --config baseUrl=http://localhost:3001"
+        # Stop test server
+        kill $(lsof -ti:3001) || true
+        ;;
+    
+    security)
+        echo "Running security tests only..."
+        run_with_timing "Security tests" "bundle exec rspec spec/security"
+        run_with_timing "Brakeman security scan" "bundle exec brakeman -q"
+        ;;
+    
+    performance)
+        echo "Running performance tests..."
+        echo "Note: Ensure the application is running on localhost:3000"
+        run_with_timing "k6 load test" "k6 run k6/scripts/load-test.js"
+        ;;
+    
+    all)
+        echo "Running all tests..."
+        
+        # Set up test database
+        echo "🗄️  Setting up test database..."
+        RAILS_ENV=test bin/rails db:drop db:create db:schema:load
+        
+        # Run all test suites
+        if [ "$COVERAGE" = "true" ]; then
+            echo "📊 Coverage reporting enabled"
+            export COVERAGE=true
+        fi
+        
+        run_with_timing "Ruby unit tests" "bundle exec rspec spec/models spec/services spec/repositories"
+        run_with_timing "Ruby integration tests" "bundle exec rspec spec/requests"
+        run_with_timing "Security tests" "bundle exec rspec spec/security"
+        run_with_timing "JavaScript tests" "npm test -- --run"
+        
+        # E2E tests
+        echo "Starting test server for E2E..."
+        RAILS_ENV=test bin/rails server -p 3001 -d
+        sleep 5
+        run_with_timing "Cypress E2E tests" "npx cypress run --config baseUrl=http://localhost:3001"
+        kill $(lsof -ti:3001) || true
+        
+        # Security scan
+        run_with_timing "Brakeman security scan" "bundle exec brakeman -q"
+        
+        if [ "$COVERAGE" = "true" ]; then
+            echo ""
+            echo "📊 Coverage Report:"
+            echo "Ruby: coverage/index.html"
+            echo "JavaScript: coverage/lcov-report/index.html"
+        fi
+        ;;
+    
+    *)
+        echo "Usage: $0 [unit|integration|e2e|security|performance|all]"
+        echo ""
+        echo "Options:"
+        echo "  COVERAGE=true - Enable coverage reporting"
+        echo ""
+        echo "Examples:"
+        echo "  $0 unit              # Run only unit tests"
+        echo "  $0 all               # Run all tests"
+        echo "  COVERAGE=true $0 all # Run all tests with coverage"
+        exit 1
+        ;;
+esac
+
+echo ""
+echo "✨ Test suite completed!"

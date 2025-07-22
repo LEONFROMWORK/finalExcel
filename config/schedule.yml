@@ -1,0 +1,21 @@
+# Sidekiq Cron 작업 스케줄
+# 매일 새벽 2시에 추천 보상 처리
+process_referral_rewards:
+  cron: "0 2 * * *"
+  class: "ProcessReferralRewardsJob"
+  queue: default
+  description: "추천인 보상 자동 처리"
+
+# 매주 월요일 오전 9시에 구독 만료 알림
+subscription_reminders:
+  cron: "0 9 * * 1"
+  class: "SendSubscriptionRemindersJob"
+  queue: mailers
+  description: "구독 만료 예정 알림 발송"
+
+# 매일 자정에 오래된 알림 정리
+cleanup_notifications:
+  cron: "0 0 * * *"
+  class: "CleanupNotificationsJob"
+  queue: low
+  description: "30일 이상 지난 알림 삭제"

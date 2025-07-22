@@ -1,0 +1,92 @@
+# Playwright-enabled Rails app for Railway deployment
+FROM ruby:3.2-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    gcc \
+    g++ \
+    make \
+    libstdc++6 \
+    curl \
+    git \
+    nodejs \
+    npm \
+    ca-certificates \
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libc6 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
+    libexpat1 \
+    libfontconfig1 \
+    libgbm1 \
+    libgcc1 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libstdc++6 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxtst6 \
+    lsb-release \
+    wget \
+    xdg-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install Node.js dependencies for Playwright
+RUN npm install -g playwright@latest
+
+# Install bundler
+RUN gem install bundler
+
+# Copy Gemfile
+COPY Gemfile Gemfile.lock ./
+
+# Add playwright-ruby-client to Gemfile if not present
+RUN echo "gem 'playwright-ruby-client'" >> Gemfile
+
+# Install Ruby dependencies
+RUN bundle config set --local deployment 'true' && \
+    bundle config set --local without 'development test' && \
+    bundle install
+
+# Copy application
+COPY . .
+
+# Install Playwright browsers (if running locally)
+# Skip this if using remote browser via Browserless
+# RUN npx playwright install chromium
+
+# Precompile assets
+RUN bundle exec rake assets:precompile || true
+
+# Environment variables
+ENV RAILS_ENV=production
+ENV RAILS_LOG_TO_STDOUT=true
+
+# Expose port
+EXPOSE 3000
+
+# Start Rails server
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "${PORT:-3000}"]

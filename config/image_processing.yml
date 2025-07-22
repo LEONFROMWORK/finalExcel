@@ -1,0 +1,55 @@
+# Image Processing Configuration
+# Ruby port of Python image processor config
+
+default: &default
+  # Supported image formats
+  supported_formats: ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+  
+  # Download settings
+  download_timeout: 30
+  max_image_size: 10485760  # 10MB
+  
+  # OCR Configuration (Tesseract)
+  ocr_config:
+    lang: 'eng'
+    config: '--psm 6'  # Uniform block of text
+  
+  # OpenRouter AI Configuration
+  openrouter_config:
+    base_url: 'https://openrouter.ai/api/v1'
+    # Tier 1&2: Free vision model for basic processing
+    tier2_model: 'meta-llama/llama-3.2-11b-vision-instruct:free'     # Free Llama vision model
+    # Tier 3: High-performance model for complex analysis (paid but affordable)
+    tier3_model: 'openai/gpt-4o-mini'                                # GPT-4o-mini: $0.15/$0.60 per 1M tokens
+    max_tokens: 4000
+    temperature: 0.1
+  
+  # Processing thresholds
+  ai_enhancement_thresholds:
+    min_ocr_text_length: 20
+    min_ocr_word_count: 5
+    chart_keywords: ['chart', 'graph', 'plot', 'visualization', 'diagram']
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+  # Use smaller models or mocks for testing
+  openrouter_config:
+    base_url: 'https://openrouter.ai/api/v1'
+    tier2_model: 'anthropic/claude-3.5-sonnet'
+    tier3_model: 'openai/gpt-4o'
+    max_tokens: 1000
+    temperature: 0.1
+
+production:
+  <<: *default
+  # Production-optimized settings
+  download_timeout: 45
+  openrouter_config:
+    base_url: 'https://openrouter.ai/api/v1'
+    tier2_model: 'anthropic/claude-3.5-sonnet'
+    tier3_model: 'openai/gpt-4o'
+    max_tokens: 4000
+    temperature: 0.1

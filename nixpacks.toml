@@ -1,0 +1,25 @@
+# Nixpacks configuration for Rails app
+
+[phases.setup]
+nixPkgs = ["ruby_3_3", "nodejs-18_x", "npm-9_x", "postgresql", "vips"]
+
+[phases.install]
+cmds = [
+    "gem install bundler",
+    "bundle install",
+    "npm ci --production=false"
+]
+
+[phases.build]
+cmds = [
+    "RAILS_ENV=production bundle exec rails assets:precompile",
+    "RAILS_ENV=production bundle exec rails assets:clean",
+    "rm -rf node_modules/@vitejs/plugin-vue/node_modules/vite"
+]
+
+[start]
+cmd = "bundle exec rails server -b 0.0.0.0 -p ${PORT:-3000}"
+
+[variables]
+RAILS_ENV = "production"
+NODE_ENV = "production"
