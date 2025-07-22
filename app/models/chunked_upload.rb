@@ -20,8 +20,8 @@ class ChunkedUpload < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :stale, -> { where('created_at < ?', 24.hours.ago) }
   
-  # Serialize arrays
-  serialize :uploaded_chunks, Array
+  # Rails 8 attribute syntax
+  attribute :uploaded_chunks, :json, default: -> { [] }
   
   # Callbacks
   before_create :set_expiration
