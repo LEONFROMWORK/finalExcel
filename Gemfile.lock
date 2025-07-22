@@ -247,6 +247,7 @@ GEM
       actionpack (>= 4.2)
       omniauth (~> 2.0)
     orm_adapter (0.5.0)
+    ostruct (0.6.3)
     parallel (1.27.0)
     parser (3.3.8.0)
       ast (~> 2.4.1)
@@ -511,6 +512,7 @@ DEPENDENCIES
   omniauth (~> 2.1)
   omniauth-google-oauth2 (~> 1.2)
   omniauth-rails_csrf_protection (~> 1.0)
+  ostruct
   pg (~> 1.1)
   pgvector (~> 0.3.2)
   playwright-ruby-client (~> 1.54)
