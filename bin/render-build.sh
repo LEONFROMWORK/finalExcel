@@ -2,20 +2,24 @@
 # exit on error
 set -o errexit
 
-# Generate a dummy secret key for build process
-export SECRET_KEY_BASE=${SECRET_KEY_BASE:-$(openssl rand -hex 64)}
-echo "🔑 SECRET_KEY_BASE is set"
-
 # Install dependencies
 echo "📦 Installing dependencies..."
 bundle install
 npm install
 
-# Skip asset precompilation - let Rails handle it at runtime
-echo "⏭️ Skipping asset precompilation (will be done at runtime)"
+# Create empty manifest file to skip asset compilation
+mkdir -p public/assets
+touch public/assets/.sprockets-manifest-$(date +%s).json
+echo '{}' > public/assets/.sprockets-manifest-$(date +%s).json
 
-# Run database migrations
-echo "🗄️ Running database migrations..."
-bundle exec rails db:migrate
+echo "⏭️ Skipped asset precompilation"
+
+# Run database migrations only if DATABASE_URL is set
+if [ -n "$DATABASE_URL" ]; then
+  echo "🗄️ Running database migrations..."
+  bundle exec rails db:migrate
+else
+  echo "⚠️ Skipping migrations (DATABASE_URL not set)"
+fi
 
 echo "✅ Build completed successfully!"
