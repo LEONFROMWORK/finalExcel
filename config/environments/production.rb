@@ -47,28 +47,19 @@ Rails.application.configure do
   config.active_support.report_deprecations = false
 
   # Replace the default in-process memory cache store with a durable alternative.
-  # Use Redis if available, otherwise fallback to memory store
-  if ENV['REDIS_URL'].present?
-    config.cache_store = :redis_cache_store, {
-      url: ENV['REDIS_URL'],
-      namespace: 'excel_unified_cache',
-      expires_in: 1.hour,
-      pool: {
-        size: ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i,
-        timeout: 5
-      }
+  # Use Redis cache store for production
+  config.cache_store = :redis_cache_store, {
+    url: ENV.fetch('REDIS_URL', 'redis://localhost:6379/1'),
+    namespace: 'excel_unified_cache',
+    expires_in: 1.hour,
+    pool: {
+      size: ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i,
+      timeout: 5
     }
-  else
-    config.cache_store = :memory_store, { size: 64.megabytes }
-  end
+  }
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
-  # Use Sidekiq if Redis is available, otherwise use async
-  if ENV['REDIS_URL'].present?
-    config.active_job.queue_adapter = :sidekiq
-  else
-    config.active_job.queue_adapter = :async
-  end
+  config.active_job.queue_adapter = :sidekiq
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
@@ -76,7 +67,7 @@ Rails.application.configure do
 
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { 
-    host: ENV.fetch('APP_HOST', 'excel-unified.railway.app'),
+    host: ENV.fetch('APP_HOST', 'localhost'),
     protocol: 'https'
   }
 
@@ -105,14 +96,16 @@ Rails.application.configure do
   #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
   # ]
   #
-  # Skip DNS rebinding protection for Railway deployment
-  config.hosts.clear
+  # DNS rebinding protection - add your production hosts
+  config.hosts << ENV['APP_HOST'] if ENV['APP_HOST'].present?
+  # Example:
+  # config.hosts << "excel-unified.onrender.com"
 
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
-  # Enable static file serving for Railway
-  config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present? || ENV["RAILWAY_ENVIRONMENT"].present?
+  # Enable static file serving for production
+  config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
 
   # Vite configuration is handled by vite_rails gem automatically
 end
