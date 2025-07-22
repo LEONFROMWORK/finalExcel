@@ -6,6 +6,9 @@ set -o errexit
 bundle install
 npm install
 
+# Set dummy secret for asset compilation
+export SECRET_KEY_BASE=${SECRET_KEY_BASE:-$(openssl rand -hex 64)}
+
 # Build assets
 bundle exec rails assets:precompile
 bundle exec rails assets:clean
