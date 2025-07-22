@@ -112,7 +112,7 @@ gem "sqlite3", "~> 1.4"
 # Redis for caching and background jobs
 gem "redis", "~> 5.0"
 gem "sidekiq", "~> 7.2"
-gem "sidekiq-cron", "~> 1.12"
+gem "sidekiq-cron", "~> 2.3"
 
 # Image Processing - 3-tier system
 # gem "ruby-opencv", "~> 0.0.18" # Image processing for table detection - Skip due to build issues
