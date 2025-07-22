@@ -47,19 +47,27 @@ Rails.application.configure do
   config.active_support.report_deprecations = false
 
   # Replace the default in-process memory cache store with a durable alternative.
-  # Use Redis cache store for production
-  config.cache_store = :redis_cache_store, {
-    url: ENV.fetch('REDIS_URL', 'redis://localhost:6379/1'),
-    namespace: 'excel_unified_cache',
-    expires_in: 1.hour,
-    pool: {
-      size: ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i,
-      timeout: 5
+  # Use Redis cache store if available, otherwise use memory store
+  if ENV['REDIS_URL'].present?
+    config.cache_store = :redis_cache_store, {
+      url: ENV['REDIS_URL'],
+      namespace: 'excel_unified_cache',
+      expires_in: 1.hour,
+      pool: {
+        size: ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i,
+        timeout: 5
+      },
+      error_handler: ->(method:, returning:, exception:) {
+        Rails.logger.error "Redis cache error: #{exception.message}"
+        returning
+      }
     }
-  }
-
-  # Replace the default in-process and non-durable queuing backend for Active Job.
-  config.active_job.queue_adapter = :sidekiq
+    config.active_job.queue_adapter = :sidekiq
+  else
+    config.cache_store = :memory_store, { size: 64.megabytes }
+    config.active_job.queue_adapter = :async
+    Rails.logger.warn "Redis not configured - using in-memory cache and async job adapter"
+  end
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
