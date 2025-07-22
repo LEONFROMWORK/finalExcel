@@ -1,0 +1,6 @@
+#!/bin/bash
+# Railway 포트 환경 변수 처리 스크립트
+
+PORT=${PORT:-3000}
+echo "Starting Rails server on port $PORT..."
+exec bundle exec rails server -b 0.0.0.0 -p $PORT

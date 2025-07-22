@@ -73,4 +73,4 @@ ENTRYPOINT ["./bin/docker-entrypoint"]
 EXPOSE 3000
 
 # 서버 시작 (포트는 환경 변수로 처리)
-CMD ["sh", "-c", "bundle exec rails server -b 0.0.0.0 -p ${PORT:-3000}"]
+CMD ["./bin/rails-server"]
