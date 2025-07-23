@@ -116,7 +116,7 @@ gem "sqlite3", "~> 1.4"
 
 # Redis for caching and background jobs
 gem "redis", "~> 5.0"
-gem "sidekiq", "~> 7.2"
+gem "sidekiq", "~> 8.0"
 gem "sidekiq-cron", "~> 1.12"
 
 # Image Processing - 3-tier system
